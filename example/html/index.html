@@ -12,6 +12,7 @@
         <link href="css/bootstrap.css" rel="stylesheet">
         <style type="text/css">
           body {padding-top: 60px;}
+		  .gocenter{text-align:center}
         </style>
     </head>
     <body>
@@ -21,9 +22,9 @@
                 <a class="brand" href="#">N8_C2online</a>
                 <nav>
                     <ul class="nav">
-                        <li class="active"><a href="#">首页</a></li>
-                        <li><a href="#about">项目管理</a></li>
-                        <li><a href="#contact">服务器管理</a></li>
+                        <li><a href="index">首页</a></li>
+                        <li class="active"><a href="project">项目管理</a></li>
+                        <li><a href="server">服务器管理</a></li>
                     </ul>
                 </nav>
                 <form action="" class="pull-right">
@@ -34,11 +35,212 @@
               </div>
             </div>
         </header>
-
         <div class="container">
-            <div class="hero-unit">
+			<!--首页开始-->
+			<ul class="breadcrumb">
+				<li>首页<span class="divider">/</span></li>
+			</ul>
+            <div class="hero-unit gocenter">
                 <h1>WELCOME!!!</h1>
             </div>
+			<!--首页结束-->
+			<ul class="breadcrumb">
+				<li>项目管理<span class="divider">/</span></li>
+			</ul>
+            <div class="well gocenter">
+                <a class="btn large primary" href="#">开始创建项目</a>
+            </div>
+			<div class="content">
+				<!--创建项目开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">项目管理</a><span class="divider">/</span></li>
+					<li class="active">创建项目</li>
+				</ul>
+				<form class="form-stacked">
+					<fieldset>
+						<div class="clearfix">
+							<label for="pname">名称</label>
+							<div class="input">
+								<input type="text" id="pname" class="xlarge" size="30" name="pname" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="vcspath">版本控制地址</label>
+							<div class="input">
+								<input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu/</span>
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="user">版本控制用户名</label>
+							<div class="input">
+								<input type="text" id="user" name="user" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="pass">版本控制密码</label>
+							<div class="input">
+								<input type="password" id="pass" name="pass" />
+							</div>
+						</div>
+					</fieldset>
+					<div class="actions">
+						<button class="btn primary" type="submit">提交</button>
+						<button class="btn" type="reset">取消</button>
+					</div>
+				</form>
+				<!--创建项目结束-->
+				<!--项目列表管理开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">项目管理</a><span class="divider">/</span></li>
+					<li class="active">项目列表</li>
+				</ul>
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>名称</th>
+							<th>版本控制地址</th>
+							<th>用户名</th>
+							<th>密码</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox" name="pcheck[]"/></td>
+							<td>盘古(pangu)</td>
+							<td>svn://192.168.1.253:4000/code/v2/branches/pangu/</td>
+							<td>chenzm</td>
+							<td>svn0001</td>
+							<td>2011-11-12 23:59:00</td>
+							<td><span class="label warning">已关闭</span></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="pcheck[]"/></td>
+							<td>盘古(pangu)</td>
+							<td>svn://192.168.1.253:4000/code/v2/branches/pangu/</td>
+							<td>chenzm</td>
+							<td>svn0001</td>
+							<td>2011-11-12 23:59:00</td>
+							<td><a href="#" class="btn success">打包</a>&nbsp;<a href="#" class="btn">包列表</a></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="7">
+								<button class="btn">打开</button>
+								<button class="btn">关闭</button>
+								<button class="btn primary">创建新项目</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+				<!--项目列表管理结束-->
+				<!--包列表开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">项目管理</a><span class="divider">/</span></li>
+					<li><a href="#">项目列表</a><span class="divider">/</span></li>
+					<li>盘古(pangu)<span class="divider">/</span></li>
+					<li class="active">包列表</li>
+				</ul>
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>版本号</th>
+							<th>创建时间</th>
+							<th>状态</th>
+							<th>最后发布服务器</th>
+							<th>最后发布时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox" name="package[]" /></td>
+							<td><a href="#">2.0.1.r7887</a></td>
+							<td>2011-11-11 20:15:30</td>
+							<td><span class="label warning">已删除</span></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td colspan="7">
+								<ol>
+									<li>do.php</li>
+									<li>/modules/User.php</li>
+									<li>/template/v2.0/index.tpl</li>
+									<li>/admin0215/adminuser.php</li>
+								</ol>
+							</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="package[]" /></td>
+							<td><a href="#">2.0.22.r9858.p21</a></td>
+							<td>2011-11-11 20:15:30</td>
+							<td><span class="label important">待发布</span></td>
+							<td></td>
+							<td></td>
+							<td><a href="#" class="btn">删除</a></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="package[]" /></td>
+							<td><a href="#">2.0.21.r9857</a></td>
+							<td>2011-11-11 20:15:30</td>
+							<td><span class="label notice">已发布</span></td>
+							<td>net服务器</td>
+							<td>2011-11-11 21:10:45</td>
+							<td><a href="#" class="btn">删除</a></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="7">
+								<select id="tserver" class="medium" name="tserver">
+									<option value="0">请选择</option>
+									<option value="0">163服务器</option>
+									<option value="0">net服务器</option>
+									<option value="0">com服务器</option>
+								</select>
+								<button class="btn primary">发布</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+				<!--包列表结束-->
+				<!--发布控制台输出开始-->
+				<div class="alert-message block-message info">
+					<a href="#" class="close">x</a>
+					<dl>
+						<dd>--->vpn拨号开始<---</dd>
+						<dd>sudo route add -net 192.168.5.0 netmask 255.255.255.0 gw 192.168.1.253</dd>
+						<dd>--->vpn拨号成功<---</dd>
+						<dd>--->开始传送数据<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+						<dd>--->数据传送成<---</dd>
+					</dl>
+				</div>
+				<!--发布控制台输出结束-->
+				<!--项目打包开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">项目管理</a><span class="divider">/</span></li>
+					<li><a href="#">项目列表</a><span class="divider">/</span></li>
+					<li>盘古(pangu)<span class="divider">/</span></li>
+					<li class="active">打包</li>
+				</ul>
+				<!--项目打包结束-->
+			</div>
             <footer><p>&copy; PPL419.com 2011 Author:soone Email:fengyue15#gmail.com</p></footer>
         </div>
     </body>
