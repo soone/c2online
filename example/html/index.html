@@ -37,21 +37,31 @@
             </div>
         </header>
         <div class="container">
-			<!--首页开始-->
-			<ul class="breadcrumb">
-				<li>首页<span class="divider">/</span></li>
-			</ul>
-            <div class="hero-unit gocenter">
-                <h1>WELCOME!!!</h1>
-            </div>
-			<!--首页结束-->
-			<ul class="breadcrumb">
-				<li>项目管理<span class="divider">/</span></li>
-			</ul>
-            <div class="well gocenter">
-                <a class="btn large primary" href="#">开始创建项目</a>
-            </div>
 			<div class="content">
+				<!--首页开始-->
+				<ul class="breadcrumb">
+					<li>首页<span class="divider">/</span></li>
+				</ul>
+				<div class="hero-unit gocenter">
+					<h1>WELCOME!!!</h1>
+				</div>
+				<!--首页结束-->
+				<!--项目管理首页开始-->
+				<ul class="breadcrumb">
+					<li>项目管理<span class="divider">/</span></li>
+				</ul>
+				<div class="well gocenter">
+					<a class="btn large primary" href="#">创建项目</a>
+				</div>
+				<!--项目管理首页结束-->
+				<!--服务器管理首页开始-->
+				<ul class="breadcrumb">
+					<li>服务器管理<span class="divider">/</span></li>
+				</ul>
+				<div class="well gocenter">
+					<a class="btn large primary" href="#">创建服务器</a>
+				</div>
+				<!--服务器管理首页结束-->
 				<!--创建项目开始-->
 				<ul class="breadcrumb">
 					<li><a href="#">项目管理</a><span class="divider">/</span></li>
@@ -206,6 +216,7 @@
 									<option value="0">com服务器</option>
 								</select>
 								<button class="btn primary">发布</button>
+								<button class="btn danger">回滚</button>
 							</td>
 						</tr>
 					</tfoot>
@@ -291,11 +302,134 @@
 					</tbody>
 				</table>
 				<div class="well">
-				<input type="text" class="normal" />
+				<input type="text" class="normal" placeholder="请填写对外版本号"/>
 				<button class="btn danger">开始打包</button> 
 				<span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>
 				</div>
 				<!--项目打包结束-->
+				<!--创建服务器开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">服务器管理</a><span class="divider">/</span></li>
+					<li class="active">创建服务器</li>
+				</ul>
+				<form class="form-stacked">
+					<fieldset>
+						<div class="clearfix">
+							<label for="sname">名称*</label>
+							<div class="input">
+								<input type="text" id="sname" class="xlarge" size="30" name="sname" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="pdir">项目物理地址*</label>
+							<div class="input">
+								<input type="text" id="pdir" class="span8" size="256" name="pdir" /><span class="help-block">比如：/data/wwwV2/</span>
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="spath">Host地址*</label>
+							<div class="input">
+								<input type="text" id="spath" class="span8" size="256" name="spath" /><span class="help-block">比如：192.168.1.253</span>
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="suser">用户名*</label>
+							<div class="input">
+								<input type="text" id="suser" name="suser" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="spass">密码*</label>
+							<div class="input">
+								<input type="password" id="spass" name="spass" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="vpnpro">vpn网关</label>
+							<div class="input">
+								<select name="vpnpro" class="mini"><option value="1">PPTP</option></select>
+								<input type="text" placeholder="192.168.1.253" id="spath" class="span5" size="256" name="spath" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="vpnname">vpn帐号</label>
+							<div class="input">
+								<input type="text" id="vpnname" name="vpnname" />
+							</div>
+						</div>
+						<div class="clearfix">
+							<label for="vpnpass">vpn密码</label>
+							<div class="input">
+								<input type="password" id="vpnpass" name="vpnpass" />
+							</div>
+						</div>
+					</fieldset>
+					<div class="actions">
+						<button class="btn primary" type="submit">提交</button>
+						<button class="btn" type="reset">取消</button>
+					</div>
+				</form>
+				<!--创建服务器结束-->
+				<!--服务器列表管理开始-->
+				<ul class="breadcrumb">
+					<li><a href="#">服务器管理</a><span class="divider">/</span></li>
+					<li class="active">服务器列表</li>
+				</ul>
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>名称</th>
+							<th>物理地址</th>
+							<th>Host地址</th>
+							<th>用户名</th>
+							<th>密码</th>
+							<th>vpn网关</th>
+							<th>vpn帐号</th>
+							<th>vpn密码</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox" name="pcheck[]"/></td>
+							<td>163服务器</td>
+							<td>/data/www/</td>
+							<td>192.168.5.163</td>
+							<td>test</td>
+							<td>test@1998</td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td>2011-11-12 23:59:00</td>
+							<td><span class="label warning">已关闭</span></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="pcheck[]"/></td>
+							<td>net服务器</td>
+							<td>/data/wwwV2/</td>
+							<td>192.168.10.13</td>
+							<td>test</td>
+							<td>test@1998</td>
+							<td>58.168.15.243</td>
+							<td>vpntest</td>
+							<td>vpn@2008</td>
+							<td>2011-11-12 23:59:00</td>
+							<td><span class="label success">正常</span></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="10">
+								<button class="btn">打开</button>
+								<button class="btn">关闭</button>
+								<button class="btn primary">创建新服务器</button>
+							</td>
+						</tr>
+					</tfoot>
+				</table>
+				<!--服务器列表管理结束-->
 			</div>
             <footer><p>&copy; PPL419.com 2011 Author:soone Email:fengyue15#gmail.com</p></footer>
         </div>
