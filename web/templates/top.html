@@ -1,0 +1,29 @@
+<%def name="navactive(x)">
+%if ac == x:
+<li class="active">\
+%else:
+<li>\
+%endif
+</%def>
+	<body>
+        <header class="topbar">
+            <div class="fill">
+              <div class="container">
+                <a class="brand" href="#">N8_C2online</a>
+                <nav>
+					<ul class="nav">
+							${navactive(1)}<a href="index">首页</a></li>
+							${navactive(2)}<a href="project">项目管理</a></li>
+							${navactive(3)}<a href="server">服务器管理</a></li>
+					</ul>
+                </nav>
+                <form action="" class="pull-right">
+                    <input class="input-small" type="text" placeholder="Username" name="username">
+                    <input class="input-small" type="password" placeholder="Password" name="password">
+                    <button class="btn" type="submit">登陆</button>
+                </form>
+              </div>
+            </div>
+        </header>
+        <div class="container">
+			<div class="content">
