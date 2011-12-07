@@ -3,16 +3,17 @@
 
 import web
 from conf import config
+import project
 
 urls = (
-	'/',  'Index',
-	'/index',  'Index',
+    '/project', project.appProject,
+	'/(.*)',  'Index',
 )
 render = config.render
 c2online = web.application(urls, globals())
 
 class Index(object):
-	def GET(self):
+	def GET(self, path):
 		return render.index(ac=1)
 
 if __name__ == "__main__":
