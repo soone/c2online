@@ -13,6 +13,7 @@
         <style type="text/css">
           body {padding-top: 60px;}
 		  .gocenter{text-align:center}
+		  .packhide{height:100px;overflow-y:auto}
         </style>
     </head>
     <body>
@@ -239,6 +240,61 @@
 					<li>盘古(pangu)<span class="divider">/</span></li>
 					<li class="active">打包</li>
 				</ul>
+				<input type="text" name="vno" placeholder="输入版本号，多个版本号用,隔开"/>&nbsp;<a href="#" class="btn primary">提交</a>
+				<table>
+					<thead>
+						<th class="span1"><input type="checkbox" name="all" /></th>
+						<th>vcs号</th>
+						<th>文件</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox" name="all" /></td>
+							<td><p>r5879</p></td>
+							<td>
+								<ul class="unstyled packhide">
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /do.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">A /template/v2.0/test.tpl</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /modules/User.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">G /image/img/loading.gif</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /do.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">A /template/v2.0/test.tpl</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /modules/User.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">G /image/img/loading.gif</span></li>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="all" /></td>
+							<td><p>r5876</p></td>
+							<td>
+								<ul class="unstyled packhide">
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /do.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">A /template/v2.0/test.tpl</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /modules/User.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">G /image/img/loading.gif</span></li>
+								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="all" /></td>
+							<td><p>r5874</p></td>
+							<td>
+								<ul class="unstyled packhide">
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /do.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">A /template/v2.0/test.tpl</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">M /modules/User.php</span></li>
+									<li><input type="checkbox" name="vf[]" /><span class="help-inline">G /image/img/loading.gif</span></li>
+								</ul>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="well">
+				<input type="text" class="normal" />
+				<button class="btn danger">开始打包</button> 
+				<span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>
+				</div>
 				<!--项目打包结束-->
 			</div>
             <footer><p>&copy; PPL419.com 2011 Author:soone Email:fengyue15#gmail.com</p></footer>
