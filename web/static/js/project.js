@@ -30,7 +30,8 @@ define(function(require, exports, module){
 			}
 
 			std.getJson('post', '/project/create/', postData, function(data){
-				alert(data['a1']);
+				alert(data['pname']);
+				std.resetActive($('#prosubmit'));
 			});
 
 			return false;

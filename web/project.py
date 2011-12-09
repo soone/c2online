@@ -7,7 +7,7 @@ import json
 urls = (
 		'', 'ReProject',
         '/',  'Project',
-		'/create/(.*)', 'Create'
+		'/create/', 'Create'
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -24,5 +24,5 @@ class Create:
 	def GET(self, action):
 		return json.dumps({"a1":11, "a2":22})
 
-	def POST(self, args):
-		return json.dumps({"a1":1, "a2":2})
+	def POST(self):
+         return json.dumps(web.input())

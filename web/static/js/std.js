@@ -45,7 +45,6 @@ define(function(require, exports, modules){
 	};
 
 	exports.resetActive = function(obj){
-		alert(activeObj);
 		$(obj).removeClass().html(activeObj.html()).addClass(activeObj.attr('class'));
 		$(obj).attr('disabled', false);
 	};
