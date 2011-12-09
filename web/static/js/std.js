@@ -3,6 +3,7 @@ define(function(require, exports, modules){
 	var disDiv = '<div id="disDiv"></div>';
 	exports.active = function(obj){
 		$(obj).html('处理中...').removeClass().addClass('btn disabled');
+		$(obj).off();
 	};
 
 	exports.cancel = function(id, ctx){
@@ -14,11 +15,10 @@ define(function(require, exports, modules){
 		return $('#main').html();
 	};
 
-	exports.validAllNotEmpty = function(arr){
-		for(var i = 0, j = arr.length; i < j; i++)
+	exports.validAllNotEmpty = function(obj){
+		for(var pro in obj)
 		{
-			if(arr[i] == '')
-				return false;
+			if(obj[pro] == '') return false;
 		}
 
 		return true;
@@ -26,7 +26,7 @@ define(function(require, exports, modules){
 
 	exports.alertErrorBox = function(id, msg, isClose){
 		if($('#errorBoxDiv').length > 0)
-			$('#errormsg').html(msg);
+			return $('#errormsg').html(msg);
 
 		var alerts = '<div id="errorBoxDiv" class="alert-message block-message error">'
 		if(isClose == 1)
@@ -39,6 +39,16 @@ define(function(require, exports, modules){
 		alerts += '<strong>Error:</strong><span id="errormsg">' + msg + '</span>';
 		alerts += '</div>';
 		$('#'+id).before(disDiv);
-		$('#disDiv').html(alerts);
+		$('#disDiv').html(alerts).fadeOut(600).fadeIn(600);
+		//this.resetActive();
+	};
+
+	exports.resetActive = function(obj){
+		$(obj).html('处理中...').removeClass().addClass('btn disabled');
+		$(obj).off();
+	};
+
+	exports.getJson = function(type, url, data, callback){
+		$.ajax({type: type, url: url, data:data, dataType: 'json', success:callback});
 	};
 });
