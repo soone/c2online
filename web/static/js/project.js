@@ -23,7 +23,11 @@ define(function(require, exports, module){
 			postData.vcsuser = $('#user').val();
 			postData.vcspass = $('#pass').val();
 			if(std.validAllNotEmpty(postData) == false)
+			{
 				std.alertErrorBox('proform', '各项都不能为空');
+				std.resetActive($('#prosubmit'));
+				return false;
+			}
 
 			std.getJson('post', '/project/create/', postData, function(data){
 				alert(data['a1']);

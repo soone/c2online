@@ -1,7 +1,9 @@
 define(function(require, exports, modules){
 	var $ = require('jquery');
 	var disDiv = '<div id="disDiv"></div>';
+	var activeObj;
 	exports.active = function(obj){
+		activeObj = $(obj).clone();
 		$(obj).html('处理中...').removeClass().addClass('btn disabled');
 		$(obj).off();
 	};
@@ -40,12 +42,12 @@ define(function(require, exports, modules){
 		alerts += '</div>';
 		$('#'+id).before(disDiv);
 		$('#disDiv').html(alerts).fadeOut(600).fadeIn(600);
-		//this.resetActive();
 	};
 
 	exports.resetActive = function(obj){
-		$(obj).html('处理中...').removeClass().addClass('btn disabled');
-		$(obj).off();
+		alert(activeObj);
+		$(obj).removeClass().html(activeObj.html()).addClass(activeObj.attr('class'));
+		$(obj).attr('disabled', false);
 	};
 
 	exports.getJson = function(type, url, data, callback){
