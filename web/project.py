@@ -2,7 +2,6 @@
 #-*-coding:utf-8-*-
 import web
 from conf import config
-import json
 
 urls = (
 		'', 'ReProject',
@@ -22,7 +21,8 @@ class Project:
 
 class Create:
 	def GET(self, action):
-		return json.dumps({"a1":11, "a2":22})
+		pass
 
 	def POST(self):
-         return json.dumps(web.input())
+		print web.input()
+		pass
