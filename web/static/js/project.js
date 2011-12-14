@@ -48,7 +48,27 @@ define(function(require, exports, module){
 		});
 
 		$('td[id^="vcs_"]').live('dblclick', function(){
-			alert($(this).html());
+			var val = $(this).text();
+			var id = $(this).attr('id');
+			$(this).html('<input type="text" value="' + val + '" class="xlarge" id="edit_' + id + '" />');
+			$('#edit_' + id).focus();
+		});
+
+		$('input[id^="edit_"]').live('blur', function(){
+			var val = $(this).val();
+			var id = $(this).attr('id');
+			if(!val){
+				std.alertErrorBox('tlist', '该值不能为空');
+				return false;
+			}
+
+			var p = id.split('_');
+			std.getJson('post', '/project/update/', {name: p[1], id: p[2], val: val}, function(data){
+				if(!data['res'])
+					std.alertErrorBox('tlist', data['msg']);
+				else
+					$('#'+id).parent().html(val);
+			});
 		});
 
 		function changeStatus(obj, status){

@@ -12,6 +12,7 @@ urls = (
 		'/create/', 'Create',
 		'/list/', 'List',
 		'/change/', 'Change',
+		'/update/', 'Update',
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -78,3 +79,24 @@ class Change:
 			return json.dumps({'res' : 1})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+
+class Update:
+	def POST(self):
+		inputs = web.input()
+		if inputs['name'] is None or \
+			inputs['id'] is None or \
+			inputs['val'] is None:
+			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
+		#修改数据
+		try:
+			name = inputs['name'].strip()
+			id = inputs['id'].strip()
+			val = inputs['val'].strip()
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#db.update('c2_project', name = $val, where = 'p_id = $db', vars = locals())
+			return json.dumps({'res' : 1})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+		return json.dumps({'res' : 1})
