@@ -7,3 +7,11 @@ render = render_mako(
 	input_encoding = CHARSET,
 	output_encoding = CHARSET
 	)
+
+dbInfo = {
+	'host' : '127.0.0.1',
+	'db' : 'c2online',
+	'user' : 'root',
+	'pw' : '123456',
+	'dbn' : 'mysql'
+	}

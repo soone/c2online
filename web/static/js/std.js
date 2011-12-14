@@ -28,7 +28,11 @@ define(function(require, exports, modules){
 
 	exports.alertErrorBox = function(id, msg, isClose){
 		if($('#errorBoxDiv').length > 0)
-			return $('#errormsg').html(msg);
+		{
+			$('#errormsg').html(msg);
+			$('#disDiv').fadeOut(600).fadeIn(600);
+			return;
+		}
 
 		var alerts = '<div id="errorBoxDiv" class="alert-message block-message error">'
 		if(isClose == 1)

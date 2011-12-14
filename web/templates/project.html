@@ -1,6 +1,6 @@
 <%include file="header.html" />
 <%include file="top.html"/>
-%if plist is not '':
+%if plist is '':
 <!--项目管理首页开始-->
 <ul class="breadcrumb">
     <li>项目管理<span class="divider">/</span></li>
@@ -10,6 +10,57 @@
 </div>
 <!--项目管理首页结束-->
 %else:
-    some
+<!--项目列表管理开始-->
+<ul class="breadcrumb">
+	<li><a href="/project/">项目管理</a><span class="divider">/</span></li>
+	<li class="active">项目列表</li>
+</ul>
+<table id="tlist">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>名称</th>
+			<th>版本控制地址</th>
+			<th>用户名</th>
+			<th>密码</th>
+			<th>创建时间</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+		<%!
+			import time
+			def formatDate(t):
+				return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(t))
+		%>
+		% for p in plist:
+		<tr>
+			<td><input type="checkbox" name="pcheck[]" value="${p.p_id}"/></td>
+			<td>${p.p_name}</td>
+			<td id="vcs_${p.p_id}">${p.p_vcspath}</td>
+			<td id="vcsuser_${p.p_id}">${p.p_user}</td>
+			<td id="vcspaass_${p.p_id}">${p.p_pass}</td>
+			<td>${formatDate(p.p_cdateline)}</td>
+			<td>
+			%if p.p_status == 1:
+				<a href="package/" class="btn success">打包</a>&nbsp;<a href="#" class="btn">包列表</a>
+			%else:
+				<span class="label warning">已关闭</span>
+			%endif
+			</td>
+		</tr>
+		%endfor
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="7">
+				<button class="btn" id="popen">打开</button>
+				<button class="btn" id="pclose">关闭</button>
+				<a href="javascript:;" class="btn primary" id="createpro">创建项目</button>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+<!--项目列表管理结束-->
 %endif
 <%include file="footer.html"/>
