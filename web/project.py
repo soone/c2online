@@ -93,9 +93,18 @@ class Update:
 			name = inputs['name'].strip()
 			id = inputs['id'].strip()
 			val = inputs['val'].strip()
+			if name == 'vcs':
+				dVal = {'p_vcspath' : val}
+			elif name == 'vcsuser':
+				dVal = {'p_user' : val}
+			elif name == 'vcspass':
+				dVal = {'p_pass': val}
+			else:
+				return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
-			#db.update('c2_project', name = $val, where = 'p_id = $db', vars = locals())
+			db.update('c2_project', where = 'p_id = $id', vars = locals(), **dVal)
 			return json.dumps({'res' : 1})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
