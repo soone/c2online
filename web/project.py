@@ -13,6 +13,7 @@ urls = (
 		'/list/', 'List',
 		'/change/', 'Change',
 		'/update/', 'Update',
+		'/package/', 'Package',
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -109,3 +110,7 @@ class Update:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 		return json.dumps({'res' : 1})
+
+class Package:
+	def GET(self):
+		pass
