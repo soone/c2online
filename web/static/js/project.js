@@ -109,29 +109,36 @@ define(function(require, exports, module){
 		$('#govcs').live('click', function(){
 			std.active(this);
 			var vIds = $('#vids').val();
-			vIdsArr = vIds.split(' ');
-			
-			if(vIds == '')
+			var vIdsArr = vIds.split(' ');
+			var vIdLen = vIdsArr.length;
+			if(!vIdLen)
 			{
 				std.alertErrorBox('vids', '请输入版本号，多个版本号用空格隔开');
 				std.resetActive(this);
 				return false;
 			}
 
-			vIds = vIds.replace(' ', '|');
+			for(var i = 0; i < vIdLen; i++)//判断版本合法性
+			{
+				if(isNaN(vIdsArr[i]))
+				{
+					std.alertErrorBox('vids', '请输入纯数字版本号');
+					std.resetActive(this);
+					return false;
+				}
+			}
 
+			vIds = vIds.split(' ').join('|');
 			std.getJson('post', '/project/vcslist/', {vids: vIds}, function(data){
 				if(data['res'] == 0)
 				{
-					std.alertErrorBox('vids', '版本号错误');
-					std.resetActive(this);
+					std.alertErrorBox('vids', data['msg']);
+					std.resetActive($('#govcs'));
 					return false;
 				}
 				else
 				{
-					location.href = "/project/";
-					return false;
-					$('#vids').val('');
+					alert(data['text']);
 				}
 			});
 		});
