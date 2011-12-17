@@ -13,18 +13,18 @@ class Vcs:
 		self.client = pysvn.Client()
 		self.client.callback_get_login = self.getLogin
 
-	def getLogin(self, relam):
+	def getLogin(self, relam, username, may_save):
 		return True, self.vUser, self.vPass, True
 
 	def getLog(self, vers = []):
 		'''按照版本号返回版本文件列表'''
-		logs = {}
+		logs = []
 		for v in vers:
 			ls = self.client.log(self.vPath, 
 			discover_changed_paths = True, 
 			revision_start = pysvn.Revision(pysvn.opt_revision_kind.number, v), 
 			revision_end = pysvn.Revision(pysvn.opt_revision_kind.number, v))
 			if len(ls) > 0:
-				logs[v] = [[l.action, l.path]for l in ls[0].changed_paths]
+				logs.append([v, [[l.action, l.path]for l in ls[0].changed_paths]])
 
 		return logs

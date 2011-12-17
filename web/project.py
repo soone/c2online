@@ -129,18 +129,18 @@ class Vcslist:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
 
-		vidsArr.sort()
+		vidsArr.sort(reverse = True)
 
 		#查找项目信息
-		#try:
-		dbase = dbHelp.DbHelp()
-		db = dbase.database()
-		res = db.select('c2_project', what = 'p_vcspath, p_user, p_pass', where = 'p_id = $pro AND p_status = 1', vars = locals())
-		if len(res) == 0:
-			raise Error
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			res = db.select('c2_project', what = 'p_vcspath, p_user, p_pass', where = 'p_id = $pro AND p_status = 1', vars = locals())
+			if len(res) == 0:
+				raise Error
 
-		rs = res[0]
-		pv = vcs.Vcs(vPath = rs.p_vcspath, vUser = rs.p_user, vPass = rs.p_pass)
-		return json.dumps({'res' : 1, 'text':pv.getLog(vidsArr)})
-		#except:
-		#	return json.dumps({'res' : 0, 'msg' : '系统错误'})
+			rs = res[0]
+			pv = vcs.Vcs(vPath = rs.p_vcspath, vUser = rs.p_user, vPass = rs.p_pass)
+			return json.dumps({'res' : 1, 'logs' : pv.getLog(vidsArr)})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '版本号错误'})
