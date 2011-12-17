@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+#-*-coding=utf-8-*-
+
+import pysvn
+
+class Vcs:
+	'''用来从版本控制系统中提取要发布到文件列表'''
+	def __init__(self, vPath, vUser, vPass):
+		self.vPath = vPath
+		self.vUser = vUser
+		self.vPass = vPass
+		prot = self.vPath.split(':')[0]
+		self.client = pysvn.Client()
+		self.client.callback_get_login = self.getLogin
+
+	def getLogin(self, relam):
+		return True, self.vUser, self.vPass, True
+
+	def getLog(self, vers = []):
+		'''按照版本号返回版本文件列表'''
+		logs = {}
+		for v in vers:
+			ls = self.client.log(self.vPath, 
+			discover_changed_paths = True, 
+			revision_start = pysvn.Revision(pysvn.opt_revision_kind.number, v), 
+			revision_end = pysvn.Revision(pysvn.opt_revision_kind.number, v))
+			if len(ls) > 0:
+				logs[v] = [[l.action, l.path]for l in ls[0].changed_paths]
+
+		return logs

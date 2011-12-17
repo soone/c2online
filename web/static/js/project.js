@@ -5,7 +5,7 @@ define(function(require, exports, module){
     var createpro = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li class="active">创建项目</li></ul><form class="form-stacked" id="proform"> <fieldset><div class="clearfix"><label for="pname">名称</label><div class="input"><input type="text" id="pname" class="xlarge" size="30" name="pname" /></div></div><div class="clearfix"><label for="vcspath">版本控制地址</label><div class="input"><input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu/</span></div></div><div class="clearfix"><label for="user">版本控制用户名</label><div class="input"><input type="text" id="user" name="user" /></div></div><div class="clearfix"><label for="pass">版本控制密码</label><div class="input"><input type="password" id="pass" name="pass" /></div></div></fieldset><div class="actions"><button id="prosubmit" class="btn primary">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
 	var successs = '';
 	var cancel = 0;//是否点击了取消
-	var packlist = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用空格隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
+	var packlist = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
 	exports.init = function(){
         $('#createpro').live('click', function(){//显示创建表单
 			main = std.cacheMain();
@@ -109,11 +109,12 @@ define(function(require, exports, module){
 		$('#govcs').live('click', function(){
 			std.active(this);
 			var vIds = $('#vids').val();
-			var vIdsArr = vIds.split(' ');
+			var vIdsArr = vIds.split(',');
 			var vIdLen = vIdsArr.length;
+			var pro = $('#pcurid').val();
 			if(!vIdLen)
 			{
-				std.alertErrorBox('vids', '请输入版本号，多个版本号用空格隔开');
+				std.alertErrorBox('vids', '请输入版本号，多个版本号用半角逗号隔开');
 				std.resetActive(this);
 				return false;
 			}
@@ -128,8 +129,8 @@ define(function(require, exports, module){
 				}
 			}
 
-			vIds = vIds.split(' ').join('|');
-			std.getJson('post', '/project/vcslist/', {vids: vIds}, function(data){
+			vIds = vIds.split(',').join('|');
+			std.getJson('post', '/project/vcslist/', {pro: pro, vids: vIds}, function(data){
 				if(data['res'] == 0)
 				{
 					std.alertErrorBox('vids', data['msg']);
@@ -139,6 +140,7 @@ define(function(require, exports, module){
 				else
 				{
 					alert(data['text']);
+					std.resetActive($('#govcs'));
 				}
 			});
 		});
