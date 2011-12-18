@@ -178,8 +178,7 @@ class Package:
 
 			#拆分字符串
 			valsArr = vals.split('|')
-			nameArr = ['f_ver', 'f_action', 'f_path']
-			insValTmp = [dict(zip(nameArr, x.split('::'))) for x in valsArr]
+			insValTmp = [dict(zip(['f_ver', 'f_action', 'f_path'], x.split('::'))) for x in valsArr]
 			insVal = []
 			for x in insValTmp:
 				x.update({'r_id' : rId})
