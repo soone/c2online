@@ -16,6 +16,7 @@ urls = (
 		'/change/', 'Change',
 		'/update/', 'Update',
 		'/vcslist/', 'Vcslist',
+		'/package/', 'Package',
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -144,3 +145,46 @@ class Vcslist:
 			return json.dumps({'res' : 1, 'logs' : pv.getLog(vidsArr)})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '版本号错误'})
+
+class Package:
+	def POST(self):
+		inputs = web.input()
+		pro = inputs['pro'].strip()
+		vals = inputs['vals'].strip()
+		verno = inputs['verno'].strip()
+		v = valids.Valids()
+		if v.isEmpty(pro) or v.isEmpty(vals) or v.isEmpty(verno):
+			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
+		#插入最新的版本信息并得到该版本对应id
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#查看项目id是否存在
+			res = db.select('c2_project', what = 'COUNT(*)', where = 'p_id = $pro AND p_status = 1', vars = locals())
+			if len(res) == 0:
+				return json.dumps({'res' : 0, 'msg' : '该项目不存在或者状态不可用'})
+
+			#查看该版本号是否存在
+			rNos = db.select('c2_revision', what = 'COUNT(*) AS c', where = 'r_no = $verno', vars = locals())
+			if len(rNos) > 0:
+				return json.dumps({'res' : 0, 'msg' : '该版本号已经存在'})
+
+			rId = db.insert('c2_revision', p_id = pro, \
+			r_no = verno, r_cdateline = time.time(), \
+			r_status = 1)
+			if rId < 1:
+				return json.dumps({'res' : 0, 'msg' : '数据库出错'})
+
+			#拆分字符串
+			valsArr = vals.split('|')
+			nameArr = ['f_ver', 'f_action', 'f_path']
+			insValTmp = [dict(zip(nameArr, x.split('::'))) for x in valsArr]
+			insVal = []
+			for x in insValTmp:
+				x.update({'r_id' : rId})
+				insVal.append(x)
+
+			#插入数据库
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统出错'})

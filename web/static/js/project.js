@@ -158,7 +158,7 @@ define(function(require, exports, module){
 						var files = [];
 						for(var x = 0, y = data['logs'][i][1].length; x < y; x++)
 						{
-							files.push('<li><input type="checkbox" name="vf[]" id="vf_' + data['logs'][i][0] + '_' + x + '" value="' + data['logs'][i][0] + '_' + data['logs'][i][1][x][0] + '_' + data['logs'][i][1][x][1] + '"/><span class="help-inline">' + data['logs'][i][1][x][0] + ' ' +  data['logs'][i][1][x][1] + '</span></li>');
+							files.push('<li><input type="checkbox" name="vf[]" id="vf_' + data['logs'][i][0] + '_' + x + '" value="' + data['logs'][i][0] + '::' + data['logs'][i][1][x][0] + '::' + data['logs'][i][1][x][1] + '"/><span class="help-inline">' + data['logs'][i][1][x][0] + ' ' +  data['logs'][i][1][x][1] + '</span></li>');
 						}
 
 						$('#main > table > tbody').append('<tr><td><input type="checkbox" id="total_' + data['logs'][i][0] + '" name="all" /></td><td><p>r' + data['logs'][i][0] + '</p></td><td><ul class="unstyled packhide">' + files.join('') + '</ul></td></tr>');
@@ -213,7 +213,23 @@ define(function(require, exports, module){
 			}
 
 			//组织数据发送服务器
-			var pid = $('#pcurid').val();
+			var pro = $('#pcurid').val();
+			var cVals = [];
+			checkboxs.each(function(){cVals.push($(this).val())});
+			std.getJson('post', '/project/package/', {verno : version, pro : pro, vals : cVals.join('|')}, function(data){
+				if(data['res'] == 0)
+				{
+					std.alertErrorBox('proform', data['msg']);
+					std.resetActive($('#prosubmit'));
+					return false;
+				}
+				else
+				{
+					location.href = "/project/";
+					return false;
+				}
+			});
+			std.resetActive(this);
 		});
 	};
 });
