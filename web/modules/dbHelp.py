@@ -3,7 +3,7 @@ import web
 
 class DbHelp:
 	def __init__(self):
-		self.dbInfo = config.dbInfo
+		self.dbInfo = config.DBINFO
 
 	def database(self):
 		return web.database(

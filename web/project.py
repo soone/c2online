@@ -7,6 +7,7 @@ import time
 from modules import dbHelp
 from modules import valids
 from modules import vcs
+from modules import vcspack
 
 urls = (
 		'', 'ReProject',
@@ -157,33 +158,42 @@ class Package:
 			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
 
 		#插入最新的版本信息并得到该版本对应id
-		try:
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			#查看项目id是否存在
-			res = db.select('c2_project', what = 'COUNT(*)', where = 'p_id = $pro AND p_status = 1', vars = locals())
-			if len(res) == 0:
-				return json.dumps({'res' : 0, 'msg' : '该项目不存在或者状态不可用'})
+		#try:
+		dbase = dbHelp.DbHelp()
+		db = dbase.database()
+		#查看项目id是否存在
+		res = db.select('c2_project', what = 'p_vcspath, p_user, p_pass', where = 'p_id = $pro AND p_status = 1', limit = '1', vars = locals())
+		if len(res) == 0:
+			return json.dumps({'res' : 0, 'msg' : '该项目不存在或者状态不可用'})
 
-			#查看该版本号是否存在
-			rNos = db.select('c2_revision', what = 'COUNT(*) AS c', where = 'r_no = $verno', vars = locals())
-			if len(rNos) > 0:
-				return json.dumps({'res' : 0, 'msg' : '该版本号已经存在'})
+		#查看该版本号是否存在
+		rNos = db.select('c2_revision', what = '*', where = 'r_no = $verno', vars = locals())
+		if len(rNos) > 0:
+			return json.dumps({'res' : 0, 'msg' : '该版本号已经存在'})
 
-			rId = db.insert('c2_revision', p_id = pro, \
-			r_no = verno, r_cdateline = time.time(), \
-			r_status = 1)
-			if rId < 1:
-				return json.dumps({'res' : 0, 'msg' : '数据库出错'})
+		rId = db.insert('c2_revision', p_id = pro, \
+		r_no = verno, r_cdateline = time.time(), \
+		r_status = 1)
+		if rId < 1:
+			return json.dumps({'res' : 0, 'msg' : '数据库出错'})
 
-			#拆分字符串
-			valsArr = vals.split('|')
-			insValTmp = [dict(zip(['f_ver', 'f_action', 'f_path'], x.split('::'))) for x in valsArr]
-			insVal = []
-			for x in insValTmp:
-				x.update({'r_id' : rId})
-				insVal.append(x)
+		#拆分字符串
+		valsArr = vals.split('|')
+		valsNum = len(valsArr)
+		insValTmp = [dict(zip(['f_ver', 'f_action', 'f_path'], x.split('::'))) for x in valsArr]
+		insVal = []
+		for x in insValTmp:
+			x.update({'r_id' : rId})
+			insVal.append(x)
 
-			#插入数据库
-		except:
-			return json.dumps({'res' : 0, 'msg' : '系统出错'})
+		#插入数据库
+		rs = db.multiple_insert('c2_files', insVal)
+		if len(rs) != valsNum:
+			return json.dumps({'res' : 0, 'msg' : '打包出错，请重试'})
+
+		#真正实际打包到相应位置
+		r = res[0]
+		vcsPack = vcspack.VcsPack(**{'vpath' : r.p_vcspath, 'vuser' : r.p_user, 'vpass' : r.p_pass, 'vid' : pro})
+		vcsPack.goPack(insVal, verno)
+		#except:
+		#	return json.dumps({'res' : 0, 'msg' : '系统出错'})

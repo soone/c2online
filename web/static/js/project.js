@@ -219,17 +219,16 @@ define(function(require, exports, module){
 			std.getJson('post', '/project/package/', {verno : version, pro : pro, vals : cVals.join('|')}, function(data){
 				if(data['res'] == 0)
 				{
-					std.alertErrorBox('proform', data['msg']);
-					std.resetActive($('#prosubmit'));
+					std.alertErrorBox('version', data['msg']);
+					std.resetActive($('#startpack'));
 					return false;
 				}
 				else
 				{
-					location.href = "/project/";
+					location.href = "/project/packlist/";
 					return false;
 				}
 			});
-			std.resetActive(this);
 		});
 	};
 });
