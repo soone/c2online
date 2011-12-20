@@ -4,7 +4,7 @@ import os
 import sys
 FILELOG = 'files.log'
 PRESHELL = 'pre.sh'
-class Server:
+class Rollback:
 	def __init__(self):
 		self.verNo = sys.argv[1]
 		self.relDir = sys.argv[2]
@@ -28,6 +28,13 @@ class Server:
 				for line in self.logLine:
 					lines = line.strip('\n').split('::')
 					self.lines.append([lines[0], lines[1]])
+
+	def rollBack(self):
+		'''回滚该版本'''
+		if len(self.lines) > 0:
+			for line in self.lines:
+				if line[0] != 'A':
+					pass
 
 	def backup(self):
 		'''发布前备份'''
