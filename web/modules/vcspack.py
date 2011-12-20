@@ -13,32 +13,32 @@ class VcsPack:
 
 	def goPack(self, vList, verNo):
 		'''开始打包'''
-		self.tempPackDir = self.dirs + verNo
+		self.verNo = verNo
+		self.tempPackDir = self.dirs + self.verNo
 		#打包前准备
 		self.expack()
-		#先生成shell文件
-		self.packShell(vList)
 		#从版本库导出文件
 		self.vcsExport(vList)
 		#压缩
 
 		#打包后清理
-		self.clear(verNo)
+		self.clear()
 		return True
 
 	def expack(self):
 		'''打包前准备工作'''
+		#创建目录
 		if os.path.isdir(self.tempPackDir):
 			os.system('rm -rf %s' % self.tempPackDir)
+		os.system('mkdir -p %s/source' % self.tempPackDir)
+		os.system('mkdir -p %s/backup' % self.tempPackDir)
+		os.system('mkdir -p %s/bin' % self.tempPackDir)
 
-		os.system('mkdir %s' % self.tempPackDir)
-
-	def packShell(self, vList):
-		'''生成shell文件'''
-		print vList
-		f = open(self.tempPackDir + '/' + config.PACKAGESHELL, 'a+')
-		for l in vList:
-			pass
+		#根据列表生成fdb.py文件
+		fdb = open('%s/bin/%s', )
 
 	def vcsExport(self, vList):
+		pass
+
+	def clear(self):
 		pass
