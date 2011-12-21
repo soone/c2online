@@ -43,7 +43,7 @@
 			<td>${formatDate(p.p_cdateline)}</td>
 			<td>
 			%if p.p_status == 1:
-				<a href="javascript:;"id="package_${p.p_id}_${p.p_name}" class="btn success">打包</a>&nbsp;<a href="#" class="btn">包列表</a>
+				<a href="javascript:;" id="package_${p.p_id}_${p.p_name}" class="btn success">打包</a>&nbsp;<a href="javascript:;" id="packlist_${p.p_id}_${p.p_name}" class="btn">包列表</a>
 			%else:
 				<span class="label warning">已关闭</span>
 			%endif

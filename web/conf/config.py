@@ -20,4 +20,4 @@ DBINFO = {
 
 #打包根目录
 PACKAGEROOT = os.path.abspath('../') + "/packdir/%s/"
-PACKAGEFILEDB = 'fdb.py'
+PACKAGEFILES = 'files.log'

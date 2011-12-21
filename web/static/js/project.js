@@ -2,11 +2,12 @@ define(function(require, exports, module){
     var $ = require('jquery');
 	var std = require('std');
     var main = '';//主框架缓存变量
-    var createpro = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li class="active">创建项目</li></ul><form class="form-stacked" id="proform"> <fieldset><div class="clearfix"><label for="pname">名称</label><div class="input"><input type="text" id="pname" class="xlarge" size="30" name="pname" /></div></div><div class="clearfix"><label for="vcspath">版本控制地址</label><div class="input"><input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu/</span></div></div><div class="clearfix"><label for="user">版本控制用户名</label><div class="input"><input type="text" id="user" name="user" /></div></div><div class="clearfix"><label for="pass">版本控制密码</label><div class="input"><input type="password" id="pass" name="pass" /></div></div></fieldset><div class="actions"><button id="prosubmit" class="btn primary">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
+    var createpro = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li class="active">创建项目</li></ul><form class="form-stacked" id="proform"> <fieldset><div class="clearfix"><label for="pname">名称</label><div class="input"><input type="text" id="pname" class="xlarge" size="30" name="pname" /></div></div><div class="clearfix"><label for="vcspath">版本控制地址</label><div class="input"><input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu</span></div></div><div class="clearfix"><label for="user">版本控制用户名</label><div class="input"><input type="text" id="user" name="user" /></div></div><div class="clearfix"><label for="pass">版本控制密码</label><div class="input"><input type="password" id="pass" name="pass" /></div></div></fieldset><div class="actions"><button id="prosubmit" class="btn primary">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
 	var successs = '';
 	var cancel = 0;//是否点击了取消
-	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
+	var goPack = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
 	var listTable = '<table><thead><th class="span1"><input type="checkbox" id="alltotal" name="all" /></th><th>vcs号</th><th>文件</th></thead><tbody></tbody></table><div class="well"><input type="text" name="version" id="version" class="normal" placeholder="请填写对外版本号"/>&nbsp;<a href="javascript:;" id="startpack" class="btn danger">开始打包</a><span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>';
+	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody><tfoot></tfoot></table></table>';
 
 	exports.init = function(){
 		//显示创建表单
@@ -111,7 +112,7 @@ define(function(require, exports, module){
 		$('a[id^="package_"]').live('click', function(){
 			var pInfo = $(this).attr('id').split('_');
 			main = std.cacheMain();
-			$('#main').hide().fadeIn('slow').html(packList);
+			$('#main').hide().fadeIn('slow').html(goPack);
 			$('#pname').html(pInfo[2]);
 			$("#pcurid").val(pInfo[1]);
 		});
@@ -202,6 +203,7 @@ define(function(require, exports, module){
 
 		//打版本号操作
 		$('#startpack').live('click', function(){
+			var isSub = $(this).attr('class').indexOf('disabled');
 			std.active(this);
 			var checkboxs = $('input[id^="vf_"]:checked');
 			var version = $('#version').val();
@@ -212,6 +214,7 @@ define(function(require, exports, module){
 				return false;
 			}
 
+			if(isSub > -1) return false;
 			//组织数据发送服务器
 			var pro = $('#pcurid').val();
 			var cVals = [];
@@ -224,11 +227,33 @@ define(function(require, exports, module){
 					return false;
 				}
 				else
-				{
-					location.href = "/project/packlist/";
-					return false;
-				}
+					showPackList($('#pname').text(), pro);
 			});
 		});
+
+		//显示项目已经打包的列表
+		$('a[id^="packlist_"]').live('click', function(){
+			var pInfo = $(this).attr('id').split('_');
+			showPackList(pInfo[2], pInfo[1]);
+		});
+
+		function showPackList(pName, pId)
+		{
+			$('#main').hide().fadeIn('slow').html(packList);
+			$('#pname').html(pName);
+			$('#listtable').ready(function(){
+				$('#listtable tbody').html('<tr><td colspan="7" style="text-align:center">正在读取,请稍候...</td></tr>');
+				//std.getJson('GET', '/project/packlist/?pro=' + pId, {}, function(data){
+				$.getJSON('/project/packlist/?pro='+pId, {pro : pId}, function(data){
+					if(data['res'] == 1)
+					{
+
+						return false;
+					}
+					else
+						$('table[id="listtable"] > tbody > tr > td').html(data['msg']);
+				});
+			});
+		}
 	};
 });

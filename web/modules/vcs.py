@@ -2,12 +2,13 @@
 #-*-coding=utf-8-*-
 import re
 import pysvn
+import os
 
 class Vcs:
 	'''用来从版本控制系统中提取要发布到文件列表'''
 	def __init__(self, vPath, vUser, vPass):
 		self.vPath = vPath
-		self.preLen = len(re.findall(r'.*://.+?\/(.*)', self.vPath)[0])
+		self.preLen = len(re.findall(r'.*://.+?\/(.*)', self.vPath)[0]) + 1
 		self.vUser = vUser
 		self.vPass = vPass
 		self.client = pysvn.Client()
@@ -28,3 +29,11 @@ class Vcs:
 				logs.append([v, [[l.action, l.path[self.preLen:]]for l in ls[0].changed_paths]])
 
 		return logs
+
+	def export(self, sourceUrl, destPath, ver):
+		'''按照版本号和路径导出'''
+		destDir = destPath[0:destPath.rindex('/')]
+		if os.path.isdir(destDir) is False:
+			os.system('mkdir -p %s' % destDir)
+
+		self.client.export(sourceUrl, destPath, revision = pysvn.Revision(pysvn.opt_revision_kind.number, ver))
