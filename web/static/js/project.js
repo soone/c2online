@@ -242,18 +242,30 @@ define(function(require, exports, module){
 			$('#main').hide().fadeIn('slow').html(packList);
 			$('#pname').html(pName);
 			$('#listtable').ready(function(){
-				$('#listtable tbody').html('<tr><td colspan="7" style="text-align:center">正在读取,请稍候...</td></tr>');
-				//std.getJson('GET', '/project/packlist/?pro=' + pId, {}, function(data){
-				$.getJSON('/project/packlist/?pro='+pId, {pro : pId}, function(data){
+				$('#listtable > tbody').html('<tr><td colspan="7" style="text-align:center">正在读取,请稍候...</td></tr>');
+				$.getJSON('/project/packlist/' + pId + '/', function(data){
 					if(data['res'] == 1)
 					{
+						var ls = data['list'];
+						var listTr = '';
+						for(var i = 0, j = ls.length; i < j; i++)
+						{
+							listTr += '<tr><td><input type="checkbox" name="package" value="' + ls[i].r_id + '"/></td><td><a href="#">' + ls[i].r_no + '</a></td><td>' + getLocalTime(ls[i].r_cdateline) + '</td><td><span class="label important">待发布</span></td><td>' + ls[i].s_name + '</td><td>' + getLocalTime(ls[i].r_dateline) + '</td><td><a href="#" class="btn">删除</a></td></tr>';
+						}
 
+						$('#listtable > tbody').html(listTr);
 						return false;
 					}
 					else
 						$('table[id="listtable"] > tbody > tr > td').html(data['msg']);
 				});
 			});
+		}
+
+		function getLocalTime(nS)
+		{
+			if(!parseInt(nS)) return '';
+			return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/时|分/g, ":").replace(/秒/g, "").replace(/日|星期.*\ /g, '');
 		}
 	};
 });

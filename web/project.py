@@ -8,17 +8,17 @@ from modules import dbHelp
 from modules import valids
 from modules import vcs
 from modules import vcspack
+import math
 
 urls = (
 		'', 'ReProject',
         '/',  'Project',
 		'/create/', 'Create',
-		'/list/', 'List',
 		'/change/', 'Change',
 		'/update/', 'Update',
 		'/vcslist/', 'Vcslist',
 		'/package/', 'Package',
-		'/packlist/(.*)', 'Packlist'
+		'/packlist/(.+)/(.*)', 'Packlist'
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -206,6 +206,40 @@ class Package:
 			return json.dumps({'res' : 0, 'msg' : '系统出错'})
 
 class Packlist:
-	def GET(self, vals):
-		print vals
-		return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
+	def GET(self, pro, page = None):
+		v = valids.Valids()
+		if v.isEmpty(pro) or int(pro) == 0:
+			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
+		if page == '':
+			page = 1
+
+		eachPage = 10
+		#查找数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#查看项目id是否存在
+			res = db.select('c2_project', what = 'p_id', where = 'p_id = $pro AND p_status = 1', limit = '1', vars = locals())
+			if len(res) == 0:
+				return json.dumps({'res' : 0, 'msg' : '该项目不存在或者状态不可用'})
+
+			#查看打包总数
+			ct = db.select('c2_revision', what = 'COUNT(*) AS c', where = 'p_id = $pro', limit = '1', vars = locals())
+			allNums = ct[0].c
+			if allNums <= 0: 
+				return json.dumps({'res' : 0, 'msg' : '暂无已经打包的列表'})
+
+			#最大页数
+			maxPage = int(math.ceil(float(allNums)/eachPage))
+			if page > maxPage:
+				page = maxPage
+
+			#查看该项目下的打包记录
+			rs = db.select('c2_revision', what = 'r_no, s_id, s_name, r_dateline, r_cdateline, r_status', where = 'p_id = $pro', limit = '%d, %d' % ((page-1)*eachPage, eachPage), vars = locals())
+			if len(rs) == 0:
+				return json.dumps({'res' : 0, 'msg' : '已经没有数据了'})
+
+			return json.dumps({'res' : 1, 'list' : [r for r in rs]})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
