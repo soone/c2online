@@ -18,7 +18,7 @@ urls = (
 		'/update/', 'Update',
 		'/vcslist/', 'Vcslist',
 		'/package/', 'Package',
-		'/packlist/(.+)/(.*)', 'Packlist'
+		'/packlist/(.+)/(\d*)', 'Packlist'
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -214,7 +214,9 @@ class Packlist:
 		if page == '':
 			page = 1
 
-		eachPage = 10
+		page = int(page)
+
+		eachPage = 1
 		#查找数据库
 		try:
 			dbase = dbHelp.DbHelp()
@@ -225,7 +227,7 @@ class Packlist:
 				return json.dumps({'res' : 0, 'msg' : '该项目不存在或者状态不可用'})
 
 			#查看打包总数
-			ct = db.select('c2_revision', what = 'COUNT(*) AS c', where = 'p_id = $pro', limit = '1', vars = locals())
+			ct = db.select('c2_revision', what = 'COUNT(*) AS c', where = 'p_id = $pro', vars = locals())
 			allNums = ct[0].c
 			if allNums <= 0: 
 				return json.dumps({'res' : 0, 'msg' : '暂无已经打包的列表'})
@@ -240,6 +242,6 @@ class Packlist:
 			if len(rs) == 0:
 				return json.dumps({'res' : 0, 'msg' : '已经没有数据了'})
 
-			return json.dumps({'res' : 1, 'list' : [r for r in rs]})
+			return json.dumps({'res' : 1, 'list' : [r for r in rs], 'maxPage' : maxPage})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})

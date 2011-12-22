@@ -7,7 +7,7 @@ define(function(require, exports, module){
 	var cancel = 0;//是否点击了取消
 	var goPack = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
 	var listTable = '<table><thead><th class="span1"><input type="checkbox" id="alltotal" name="all" /></th><th>vcs号</th><th>文件</th></thead><tbody></tbody></table><div class="well"><input type="text" name="version" id="version" class="normal" placeholder="请填写对外版本号"/>&nbsp;<a href="javascript:;" id="startpack" class="btn danger">开始打包</a><span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>';
-	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody><tfoot></tfoot></table></table>';
+	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th colspan="7"><select id="tserver" class="medium" name="tserver"><option value="0">请选择</option></select>&nbsp;<button class="btn primary">发布</button>&nbsp;<button class="btn danger">回滚</button></th></tr><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody></table><div class="pagination"><ul><li class="prev" id="pagepre"><a href="javascript:;" id="pp">&larr; Previous</a></li><li class="next"><a href="javascript:;" id="np">Next &rarr;</a></li></ul></div>';
 
 	exports.init = function(){
 		//显示创建表单
@@ -237,13 +237,14 @@ define(function(require, exports, module){
 			showPackList(pInfo[2], pInfo[1]);
 		});
 
-		function showPackList(pName, pId)
+		function showPackList(pName, pId, page)
 		{
 			$('#main').hide().fadeIn('slow').html(packList);
 			$('#pname').html(pName);
+            page = !page ? 1 : page;
 			$('#listtable').ready(function(){
 				$('#listtable > tbody').html('<tr><td colspan="7" style="text-align:center">正在读取,请稍候...</td></tr>');
-				$.getJSON('/project/packlist/' + pId + '/', function(data){
+				$.getJSON('/project/packlist/' + pId + '/' + page, function(data){
 					if(data['res'] == 1)
 					{
 						var ls = data['list'];
@@ -254,6 +255,27 @@ define(function(require, exports, module){
 						}
 
 						$('#listtable > tbody').html(listTr);
+                        var pageRange = setPage((!page ? 1 : page), data['maxPage'], 2);
+                        var pl = '';
+                        for(var i = pageRange[0]; i <= pageRange[1]; i++)
+                        {
+                            pl += '<li ' + (i == page ? 'class="active"' : '') + '><a href="javascript:;">' + i + '</a></li>';
+                        }
+
+                        if(data['maxPage'] > pageRange[1])
+                            pl += '<li><a href="javascript:;">...</a></li><li><a href="javascript:;">' + data['maxPage'] + '</li>';
+
+                        if(page == 1)
+                            $("#pagepre").removeClass().addClass('prev disabled');
+                        else
+                            $("#pagepre").removeClass('disabled');
+
+                        if(page == data['maxPage'])
+                            $("#nextpage").removeClass().addClass('next disabled');
+                        else
+                            $("#nextpage").removeClass('disabled');
+
+                        $('#pagepre').after(pl);
 						return false;
 					}
 					else
@@ -267,5 +289,23 @@ define(function(require, exports, module){
 			if(!parseInt(nS)) return '';
 			return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/时|分/g, ":").replace(/秒/g, "").replace(/日|星期.*\ /g, '');
 		}
+
+        //返回页码的开始和结束
+        function setPage(page, max, sep)
+        {
+            if(!sep) sep = 2;
+            var maxPage = sep*2+1;
+            var prev = page - 2;
+            var next = page + 2;
+            var min = max - maxPage + 1;
+            if((prev <= 0 && next >= max) || (prev > 0 && next >= max))
+                return min > 0 ? [min, max] : [1, max];
+
+            if(prev <= 0 && next < max)
+                return min > 0 ? [1, maxPage] : [1, max];
+
+            if(prev > 0 && next < max)
+                return min > 0 ? [prev, next] : [prev, max];
+        }
 	};
 });
