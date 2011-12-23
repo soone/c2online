@@ -2,42 +2,60 @@ define(function(require, exports, module){
     var $ = require('jquery');
 	var std = require('std');
 	var main = std.cacheMain();//主框架缓存变量
-    var createPro = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li class="active">创建项目</li></ul><form class="form-stacked" id="proform"> <fieldset><div class="clearfix"><label for="pname">名称</label><div class="input"><input type="text" id="pname" class="xlarge" size="30" name="pname" /></div></div><div class="clearfix"><label for="vcspath">版本控制地址</label><div class="input"><input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu</span></div></div><div class="clearfix"><label for="user">版本控制用户名</label><div class="input"><input type="text" id="user" name="user" /></div></div><div class="clearfix"><label for="pass">版本控制密码</label><div class="input"><input type="password" id="pass" name="pass" /></div></div></fieldset><div class="actions"><button id="prosubmit" class="btn primary">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
-	var goPack = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
-	var listTable = '<table><thead><th class="span1"><input type="checkbox" id="alltotal" name="all" /></th><th>vcs号</th><th>文件</th></thead><tbody></tbody></table><div class="well"><input type="text" name="version" id="version" class="normal" placeholder="请填写对外版本号"/>&nbsp;<a href="javascript:;" id="startpack" class="btn danger">开始打包</a><span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>';
-	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th colspan="7"><select id="tserver" class="medium" name="tserver"><option value="0">请选择</option></select>&nbsp;<button class="btn primary">发布</button>&nbsp;<button class="btn danger">回滚</button></th></tr><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody></table><div class="pagination" id="pagebar"><ul></ul></div><input type="hidden" id="pcurid" />';
+    var createser = '<ul class="breadcrumb"><li><a href="/servers">服务器管理</a><span class="divider">/</span></li><li class="active">创建服务器</li></ul><form class="form-stacked" id="serform"><fieldset><div class="clearfix"><label for="pid">所属项目*</label><div class="input"><select name="pid" id="pid"><option value="">请选择</option></select></div></div><div class="clearfix"><label for="sname">名称*</label><div class="input"><input type="text" id="sname" class="xlarge" size="30" name="sname" /></div></div><div class="clearfix"><label for="pdir">在线物理地址*</label><div class="input"><input type="text" id="pdir" class="span8" size="256" name="pdir" /><span class="help-block">比如：/data/wwwV2/</span></div></div><div class="clearfix"><label for="pdir">在线备份地址*</label><div class="input"><input type="text" id="bdir" class="span8" size="256" name="bdir" /><span class="help-block">比如：/data/release/</span></div></div><div class="clearfix"><label for="spath">Host地址*</label><div class="input"><input type="text" id="spath" class="span8" size="256" name="spath" /><span class="help-block">比如：192.168.1.253</span></div></div><div class="clearfix"><label for="suser">用户名*</label><div class="input"><input type="text" id="suser" name="suser" /></div></div><div class="clearfix"><label for="spass">密码*</label><div class="input"><input type="password" id="spass" name="spass" /></div></div><div class="clearfix"><label for="vpnpro">vpn网关</label><div class="input"><select name="vpnpro" class="mini"><option value="1">PPTP</option></select>&nbsp;<input type="text" placeholder="192.168.1.253" id="svpn" class="span5" size="256" name="svpn" /></div></div><div class="clearfix"><label for="vpnname">vpn帐号</label><div class="input"><input type="text" id="vpnname" name="vpnname" /></div></div><div class="clearfix"><label for="vpnpass">vpn密码</label><div class="input"><input type="password" id="vpnpass" name="vpnpass" /></div></div></fieldset><div class="actions"><button class="btn primary" id="sersubmit">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
 
 	exports.init = function(){
 		//显示创建表单
-        $('#createpro').live('click', function(){$('#main').hide().fadeIn('slow').html(createPro);});
+        $('#createser').live('click', function(){
+			$('#main').hide().fadeIn('slow').html(createser);
+			//取得项目列表
+			$.getJSON('/project/shortlist/', function(data){
+				if(data['res'] == 1)
+				{
+					for(var i = 0, j = data['list'].length; i < j; i++)
+					{
+						$('#pid').append('<option value="' + data['list'][i].p_id + '">' + data['list'][i].p_name + '</option>');
+					}
+				}
+				else
+					std.alertErrorBox('serform', data['msg']);
+			});
+		});
 		//点击取消按钮
-		$('#cancel').live('click', function(){std.cancel('main', main);});
+		$('#cancel').live('click', function(){var cancel = std.cancel('main', main);});
 		//提交创建表单
-		$('#proform').live('submit', function(){
-			std.active($('#prosubmit'));
-			$('#prosubmit').attr('disabled', true);
+		$('#serform').live('submit', function(){
+			std.active($('#sersubmit'));
+			$('#sersubmit').attr('disabled', true);
 			var postData ={};
-			postData.pname = $('#pname').val();
-			postData.vcs = $('#vcspath').val();
-			postData.vcsuser = $('#user').val();
-			postData.vcspass = $('#pass').val();
+			postData.sname = $('#sname').val();
+			postData.pdir = $('#pdir').val();
+			postData.bdir= $('#bdir').val();
+			postData.spath = $('#spath').val();
+			postData.suser = $('#suser').val();
+			postData.spass = $('#spass').val();
+			postData.pid = $('#pid').val();
 			if(std.validAllNotEmpty(postData) == false)
 			{
-				std.alertErrorBox('proform', '各项都不能为空');
-				std.resetActive($('#prosubmit'));
+				std.alertErrorBox('serform', '带*号不能为空');
+				std.resetActive($('#sersubmit'));
 				return false;
 			}
 
-			std.getJson('post', '/project/create/', postData, function(data){
+			postData.svpn = $('#svpn').val();
+			postData.svpnname = $('#svpnname').val();
+			postData.svpnpass = $('#svpnpass').val();
+
+			std.getJson('post', '/servers/create/', postData, function(data){
 				if(data['res'] == 0)
 				{
-					std.alertErrorBox('proform', data['msg']);
-					std.resetActive($('#prosubmit'));
+					std.alertErrorBox('serform', data['msg']);
+					std.resetActive($('#sersubmit'));
 					return false;
 				}
 				else
 				{
-					location.href = "/project/";
+					location.href = "/servers/";
 					return false;
 				}
 			});

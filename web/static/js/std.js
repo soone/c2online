@@ -10,7 +10,7 @@ define(function(require, exports, modules){
 
 	exports.cancel = function(id, ctx){
 		$('#' + id).hide().fadeIn('slow').html(ctx);    
-		return 1;
+		return true;
 	};
 
 	exports.cacheMain = function(){

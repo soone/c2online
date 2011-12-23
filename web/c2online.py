@@ -4,8 +4,10 @@
 import web
 from conf import config
 import project
+import servers
 
 urls = (
+	'/servers', servers.appServers,
     '/project', project.appProject,
 	'/(.*)',  'Index',
 )

@@ -16,9 +16,12 @@ urls = (
 		'/create/', 'Create',
 		'/change/', 'Change',
 		'/update/', 'Update',
-		'/vcslist/', 'Vcslist',
+		'/shortlist/', 'ShortList',
+		'/vcslist/', 'VcsList',
 		'/package/', 'Package',
-		'/packlist/(.+)/(\d*)', 'Packlist'
+		'/packlist/(.+)/(\d*)', 'PackList',
+		'/packdetail/(\d+)', 'PackDetail',
+		'/packstatus/(\d+)/(\d+)', 'PackStatus',
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -29,12 +32,16 @@ class ReProject:
 class Project:
     def GET(self):
 		'''取数据库项目信息'''
-		dbase = dbHelp.DbHelp()
-		db = dbase.database()
-		plist = db.select('c2_project', order='p_status, p_cdateline desc')
-		if len(plist) == 0:
-			plist = ''
-		return render.project(plist = plist)
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			plist = db.select('c2_project', order='p_status, p_cdateline desc')
+			if len(plist) == 0:
+				plist = ''
+			return render.project(plist = plist, ac = 2)
+		except:
+			return render.project(ac = 2)
+
 
 class Create:
 	def POST(self):
@@ -123,7 +130,7 @@ class Update:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 		return json.dumps({'res' : 1})
 
-class Vcslist:
+class VcsList:
 	def POST(self):
 		inputs = web.input()
 		vids = inputs['vids'].strip()
@@ -205,7 +212,7 @@ class Package:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统出错'})
 
-class Packlist:
+class PackList:
 	def GET(self, pro, page = None):
 		v = valids.Valids()
 		if v.isEmpty(pro) or int(pro) == 0:
@@ -216,7 +223,7 @@ class Packlist:
 
 		page = int(page)
 
-		eachPage = 1
+		eachPage = 10
 		#查找数据库
 		try:
 			dbase = dbHelp.DbHelp()
@@ -238,10 +245,58 @@ class Packlist:
 				page = maxPage
 
 			#查看该项目下的打包记录
-			rs = db.select('c2_revision', what = 'r_no, s_id, s_name, r_dateline, r_cdateline, r_status', where = 'p_id = $pro', limit = '%d, %d' % ((page-1)*eachPage, eachPage), vars = locals())
+			rs = db.select('c2_revision', what = 'r_id, r_no, s_id, s_name, r_dateline, r_cdateline, r_status', where = 'p_id = $pro', limit = '%d, %d' % ((page-1)*eachPage, eachPage), order = 'r_id DESC', vars = locals())
 			if len(rs) == 0:
 				return json.dumps({'res' : 0, 'msg' : '已经没有数据了'})
 
 			return json.dumps({'res' : 1, 'list' : [r for r in rs], 'maxPage' : maxPage})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
+
+class PackDetail:
+	def GET(self, rId):
+		v = valids.Valids();
+		if v.isEmpty(rId) or int(rId) == 0:
+			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
+		#查找数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#查看项目id是否存在
+			res = db.select('c2_files', what = 'f_ver, f_path', where = 'r_id = $rId', vars = locals())
+			if len(res) == 0:
+				return json.dumps({'res' : 0, 'msg' : '该版本没有包含任何文件'})
+
+			return json.dumps({'res' : 1, 'list' : [r for r in res]})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
+
+class PackStatus:
+	def GET(self, rSt, rId):
+		v = valids.Valids()
+		if v.isEmpty(rId) or int(rId) == 0 or v.isEmpty(rSt) or int(rSt) == 0 or int(rSt) not in [1, 2]:
+			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
+
+		#更新数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			db.update('c2_revision', r_status = rSt, where = 'r_id = $rId', vars = locals())
+			return json.dumps({'res' : 1})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '删除失败'})
+
+class ShortList:
+	def GET(self):
+		'''取数据库项目信息'''
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			plist = db.select('c2_project', what = 'p_id, p_name', order='p_status, p_cdateline desc')
+			if len(plist) == 0:
+				return json.dumps({'res' : 0, 'msg' : '暂无项目，请先创建项目'})
+
+			return json.dumps({'res' : 1, 'list' : [l for l in plist]})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '项目列表读取失败'})

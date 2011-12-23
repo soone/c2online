@@ -1,6 +1,6 @@
 <%include file="header.html" />
 <%include file="top.html"/>
-%if plist is '':
+%if plist is '' or plist is none:
 <!--项目管理首页开始-->
 <ul class="breadcrumb">
     <li>项目管理<span class="divider">/</span></li>
@@ -63,4 +63,5 @@
 </table>
 <!--项目列表管理结束-->
 %endif
+<script language="javascript" type="text/javascript">seajs.use('/static/js/project', function(project) {project.init();});</script>
 <%include file="footer.html"/>
