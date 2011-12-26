@@ -41,7 +41,6 @@ define(function(require, exports, module){
 					return false;
 				}
 			});
-
 			return false;
 		});
 
@@ -77,7 +76,7 @@ define(function(require, exports, module){
 			var checkboxs = $('input[name="pcheck[]"]:checked');
 			if(!checkboxs.length)
 			{
-				std.alertErrorBox('tlist', '请至少选择一项1');
+				std.alertErrorBox('tlist', '请至少选择一项');
 				std.resetActive(obj);
 				return false;
 			}
@@ -374,8 +373,8 @@ define(function(require, exports, module){
         {
             if(!sep) sep = 2;
             var maxPage = sep*2+1;
-            var prev = page - 2;
-            var next = page + 2;
+            var prev = page - sep;
+            var next = page + sep;
             var min = max - maxPage + 1;
             if((prev <= 0 && next >= max) || (prev > 0 && next >= max))
                 return min > 0 ? [min, max] : [1, max];

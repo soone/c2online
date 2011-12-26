@@ -15,56 +15,57 @@
 	<li><a href="/servers/">服务器管理</a><span class="divider">/</span></li>
 	<li class="active">服务器列表</li>
 </ul>
-<table>
+<table id='slist'>
 	<thead>
 		<tr>
 			<th>#</th>
 			<th>名称</th>
-			<th>物理地址</th>
-			<th>Host地址</th>
-			<th>用户名</th>
-			<th>密码</th>
-			<th>vpn网关</th>
-			<th>vpn帐号</th>
-			<th>vpn密码</th>
+			<th>服务器详情</th>
 			<th>创建时间</th>
-			<th>操作</th>
+			<th>状态</th>
 		</tr>
 	</thead>
 	<tbody>
+		<%!
+			import time
+			def formatDate(t):
+				return time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(t))
+		%>
+		% for s in slist:
 		<tr>
-			<td><input type="checkbox" name="pcheck[]"/></td>
-			<td>163服务器</td>
-			<td>/data/www/</td>
-			<td>192.168.5.163</td>
-			<td>test</td>
-			<td>test@1998</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td>2011-11-12 23:59:00</td>
-			<td><span class="label warning">已关闭</span></td>
+			<td><input type="checkbox" name="scheck" value="${s.s_id}"/></td>
+			<td>${s.s_name}</td>
+			<td>
+				<ul class="unstyled">
+					<li><span class="blue">生产地址：</span><span id="ser_pdir_${s.s_id}">${s.s_pdir}</span></li>
+					<li><span class="blue">备份地址：</span><span id="ser_bdir_${s.s_id}">${s.s_bdir}</li>
+					<li><span class="blue">host地址：</span><span id="ser_host_${s.s_id}">${s.s_host}</li>
+					<li><span class="blue">用户名：</span><span id="ser_user_${s.s_id}">${s.s_user}</li>
+					<li><span class="blue">密码：</span><span id="ser_pass_${s.s_id}">${s.s_pass}</li>
+					%if s.s_vpn != '':
+					<li><span class="blue">vpn网关：</span><span id="ser_vpn_${s.s_id}">${s.s_vpn}</li>
+					<li><span class="blue">vpn帐号：</span><span id="ser_vpnuser_${s.s_id}">${s.s_vpnuser}</li>
+					<li><span class="blue">vpn密码：</span><span id="ser_vpnpass_${s.s_id}">${s.s_vpnpass}</li>
+					%endif
+				</ul>
+			</td>
+			<td>${formatDate(s.s_cdateline)}</td>
+			<td>
+			%if s.s_status == 1: 
+				<span class="label success">正常</span>
+			%else:
+				<span class="label warning">已关闭</span>
+			%endif
+			</td>
 		</tr>
-		<tr>
-			<td><input type="checkbox" name="pcheck[]"/></td>
-			<td>net服务器</td>
-			<td>/data/wwwV2/</td>
-			<td>192.168.10.13</td>
-			<td>test</td>
-			<td>test@1998</td>
-			<td>58.168.15.243</td>
-			<td>vpntest</td>
-			<td>vpn@2008</td>
-			<td>2011-11-12 23:59:00</td>
-			<td><span class="label success">正常</span></td>
-		</tr>
+		%endfor
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="10">
-				<button class="btn">打开</button>
-				<button class="btn">关闭</button>
-				<button class="btn primary">创建新服务器</button>
+			<td colspan="5">
+				<button class="btn" id="sopen">打开</button>
+				<button class="btn" id="sclose">关闭</button>
+				<a class="btn large primary" href="javascript:;" id="createser">创建服务器</a>
 			</td>
 		</tr>
 	</tfoot>

@@ -380,13 +380,7 @@
 						<tr>
 							<th>#</th>
 							<th>名称</th>
-							<th>物理地址</th>
-							<th>Host地址</th>
-							<th>用户名</th>
-							<th>密码</th>
-							<th>vpn网关</th>
-							<th>vpn帐号</th>
-							<th>vpn密码</th>
+							<th>服务器详情</th>
 							<th>创建时间</th>
 							<th>操作</th>
 						</tr>
@@ -395,28 +389,20 @@
 						<tr>
 							<td><input type="checkbox" name="pcheck[]"/></td>
 							<td>163服务器</td>
-							<td>/data/www/</td>
-							<td>192.168.5.163</td>
-							<td>test</td>
-							<td>test@1998</td>
-							<td></td>
-							<td></td>
-							<td></td>
+							<td>
+								<ul class="unstyled">
+									<li><span class="blue">备份地址：</span>/data/release/</li>
+									<li><span class="blue">生产地址：</span>/data/wwwV2/</li>
+									<li><span class="blue">host地址：</span>192.168.10.13</li>
+									<li><span class="blue">用户名：</span>root</li>
+									<li><span class="blue">密码：</span>root@test</li>
+									<li><span class="blue">vpn网关：</span>58.68.151.246</li>
+									<li><span class="blue">vpn帐号：</span>chenzm</li>
+									<li><span class="blue">vpn密码：</span>test1234</li>
+								</ul>
+							</td>
 							<td>2011-11-12 23:59:00</td>
-							<td><span class="label warning">已关闭</span></td>
-						</tr>
-						<tr>
-							<td><input type="checkbox" name="pcheck[]"/></td>
-							<td>net服务器</td>
-							<td>/data/wwwV2/</td>
-							<td>192.168.10.13</td>
-							<td>test</td>
-							<td>test@1998</td>
-							<td>58.168.15.243</td>
-							<td>vpntest</td>
-							<td>vpn@2008</td>
-							<td>2011-11-12 23:59:00</td>
-							<td><span class="label success">正常</span></td>
+							<td><span class="label success">正常</span><span class="label warning">已关闭</span></td>
 						</tr>
 					</tbody>
 					<tfoot>

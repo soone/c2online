@@ -128,7 +128,6 @@ class Update:
 			return json.dumps({'res' : 1})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
-		return json.dumps({'res' : 1})
 
 class VcsList:
 	def POST(self):
