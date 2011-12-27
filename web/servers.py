@@ -6,6 +6,7 @@ import json
 import time
 from modules import dbHelp
 from modules import valids
+import sys
 
 urls = (
 		'', 'ReServers',
@@ -13,6 +14,8 @@ urls = (
 		'/create/', 'Create',
 		'/change/', 'Change',
 		'/update/', 'Update',
+		'/test/(.*)', 'Test',
+		'/test1/', 'Test1',
         )
 render = config.render
 appServers = web.application(urls, globals())
@@ -146,3 +149,16 @@ class Update:
 			return json.dumps({'res' : 1})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+
+class Test1:
+	def GET(self):
+		return render.servers(ac = 3)
+
+class Test:
+	def GET(self, count):
+		web.header('Content-type', 'text/html;charset=UTF-8')
+		web.header("Cache-Control", "no-cache, must-revalidate")
+		web.header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT")
+		for i in range(50):
+			time.sleep(1)
+			yield str(i) + "<br/>"
