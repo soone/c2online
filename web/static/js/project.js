@@ -5,7 +5,7 @@ define(function(require, exports, module){
     var createPro = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li class="active">创建项目</li></ul><form class="form-stacked" id="proform"> <fieldset><div class="clearfix"><label for="pname">名称</label><div class="input"><input type="text" id="pname" class="xlarge" size="30" name="pname" /></div></div><div class="clearfix"><label for="vcspath">版本控制地址</label><div class="input"><input type="text" id="vcspath" class="span8" size="256" name="vcspath" /><span class="help-block">比如：svn://192.168.1.253:4000/code/v2/branches/pangu</span></div></div><div class="clearfix"><label for="user">版本控制用户名</label><div class="input"><input type="text" id="user" name="user" /></div></div><div class="clearfix"><label for="pass">版本控制密码</label><div class="input"><input type="password" id="pass" name="pass" /></div></div></fieldset><div class="actions"><button id="prosubmit" class="btn primary">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
 	var goPack = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">打包</li></ul><input type="text" id="vids" name="vno" placeholder="输入版本号，多个版本号用半角逗号隔开"/>&nbsp;<input type="hidden" id="pcurid" /><a href="javascript:;" id="govcs" class="btn primary">提交</a>';
 	var listTable = '<table><thead><th class="span1"><input type="checkbox" id="alltotal" name="all" /></th><th>vcs号</th><th>文件</th></thead><tbody></tbody></table><div class="well"><input type="text" name="version" id="version" class="normal" placeholder="请填写对外版本号"/>&nbsp;<a href="javascript:;" id="startpack" class="btn danger">开始打包</a><span class="help-block">如：2.0.15.r5798或者2.0.16.r5799.p15(补丁的版本号规则)</span>';
-	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th colspan="7"><select id="tserver" class="medium" name="tserver"><option value="0">请选择</option></select>&nbsp;<button class="btn primary">发布</button>&nbsp;<button class="btn danger">回滚</button></th></tr><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody></table><div class="pagination" id="pagebar"><ul></ul></div><input type="hidden" id="pcurid" />';
+	var packList = '<ul class="breadcrumb"><li><a href="/project/">项目管理</a><span class="divider">/</span></li><li><a href="/project/">项目列表</a><span class="divider">/</span></li><li><span id="pname"></span><span class="divider">/</span></li><li class="active">包列表</li></ul><table id="listtable"><thead><tr><th colspan="7"><select id="tserver" class="medium" name="tserver"><option value="0">请选择</option></select>&nbsp;<a href="javascript:;" id="action_prele" class="btn primary">发布</a>&nbsp;<a href="javascript:;" id="action_proll" class="btn danger">回滚</a></th></tr><tr><th>#</th><th>版本号</th><th>创建时间</th><th>状态</th><th>最后发布服务器</th><th>最后发布时间</th><th>操作</th></tr></thead><tbody></tbody></table><div class="pagination" id="pagebar"><ul></ul></div><input type="hidden" id="pcurid" />';
 
 	exports.init = function(){
 		//显示创建表单
@@ -14,7 +14,7 @@ define(function(require, exports, module){
 		$('#cancel').live('click', function(){std.cancel('main', main);});
 		//提交创建表单
 		$('#proform').live('submit', function(){
-			std.active($('#prosubmit'));
+			std.active('prosubmit');
 			$('#prosubmit').attr('disabled', true);
 			var postData ={};
 			postData.pname = $('#pname').val();
@@ -24,7 +24,7 @@ define(function(require, exports, module){
 			if(std.validAllNotEmpty(postData) == false)
 			{
 				std.alertErrorBox('proform', '各项都不能为空');
-				std.resetActive($('#prosubmit'));
+				std.resetActive('prosubmit');
 				return false;
 			}
 
@@ -32,7 +32,7 @@ define(function(require, exports, module){
 				if(data['res'] == 0)
 				{
 					std.alertErrorBox('proform', data['msg']);
-					std.resetActive($('#prosubmit'));
+					std.resetActive('prosubmit');
 					return false;
 				}
 				else
@@ -72,12 +72,13 @@ define(function(require, exports, module){
 
 		//项目列表状态修改函数
 		function changeStatus(obj, status){
-			std.active(obj);
+			var id = $(obj).attr('id');
+			std.active(id);
 			var checkboxs = $('input[name="pcheck[]"]:checked');
 			if(!checkboxs.length)
 			{
 				std.alertErrorBox('tlist', '请至少选择一项');
-				std.resetActive(obj);
+				std.resetActive(id);
 				return false;
 			}
 
@@ -87,7 +88,7 @@ define(function(require, exports, module){
 				if(!data['res'])
 				{
 					std.alertErrorBox('tlist', data['msg']);
-					std.resetActive(obj);
+					std.resetActive(id);
 				}
 				else
 					location.href = "/project/";
@@ -109,7 +110,7 @@ define(function(require, exports, module){
 
 		//根据版本号显示项目打包的文件信息
 		$('#govcs').live('click', function(){
-			std.active(this);
+			std.active('govcs');
 			var vIds = $('#vids').val();
 			var vIdsArr = vIds.split(',');
 			var vIdLen = vIdsArr.length;
@@ -117,7 +118,7 @@ define(function(require, exports, module){
 			if(!vIdLen)
 			{
 				std.alertErrorBox('vids', '请输入版本号，多个版本号用半角逗号隔开');
-				std.resetActive(this);
+				std.resetActive('govcs');
 				return false;
 			}
 
@@ -126,7 +127,7 @@ define(function(require, exports, module){
 				if(isNaN(vIdsArr[i]))
 				{
 					std.alertErrorBox('vids', '请输入纯数字版本号');
-					std.resetActive(this);
+					std.resetActive('govcs');
 					return false;
 				}
 			}
@@ -136,7 +137,7 @@ define(function(require, exports, module){
 				if(data['res'] == 0)
 				{
 					std.alertErrorBox('vids', data['msg']);
-					std.resetActive($('#govcs'));
+					std.resetActive('govcs');
 					return false;
 				}
 				else
@@ -155,7 +156,7 @@ define(function(require, exports, module){
 						$('#main > table > tbody').append('<tr><td><input type="checkbox" id="total_' + data['logs'][i][0] + '" name="all" /></td><td><p>r' + data['logs'][i][0] + '</p></td><td><ul class="unstyled packhide">' + files.join('') + '</ul></td></tr>');
 					}
 
-					std.resetActive($('#govcs'));
+					std.resetActive('govcs');
 				}
 			});
 		});
@@ -194,13 +195,13 @@ define(function(require, exports, module){
 		//打版本号操作
 		$('#startpack').live('click', function(){
 			var isSub = $(this).attr('class').indexOf('disabled');
-			std.active(this);
+			std.active('startpack');
 			var checkboxs = $('input[id^="vf_"]:checked');
 			var version = $('#version').val();
 			if(!checkboxs.length || !version)
 			{
 				std.alertErrorBox('version', '请填写版本号并且至少选择一个文件');
-				std.resetActive(this);
+				std.resetActive('startpack');
 				return false;
 			}
 
@@ -214,7 +215,7 @@ define(function(require, exports, module){
 				if(data['res'] == 0)
 				{
 					std.alertErrorBox('version', data['msg']);
-					std.resetActive($('#startpack'));
+					std.resetActive('startpack');
 					return false;
 				}
 				else
@@ -282,23 +283,26 @@ define(function(require, exports, module){
 			var idArr = $(this).attr('id').split('_');
 			var type = idArr[2];
 			var id = idArr[3];
-			std.active(this);
+			var parentObj = $('#p_chastatus_' + type + '_' + id).parent();
+			std.active($(this).attr('id'));
 			$.getJSON('/project/packstatus/' + type + '/' + id, function(data){
 				if(data['res'] == 1)
 				{
 					if(type == 2)
 					{
 						$('#status_' + id).html('<span class="label warning">已删除</span>');
-						$('#p_chastatus_' + type + '_' + id).parent().html('<a href="javascript:;" id="p_chastatus_1_' + id + '" class="btn">设置为待发布</a>');
+						parentObj.html('<a href="javascript:;" id="p_chastatus_1_' + id + '" class="btn">设置为待发布</a>');
+						$('#rid_' + id).removeAttr('checked').attr('disabled', 'disabled');
 					}
 					else
 					{
 						$('#status_' + id).html('<span class="label important">待发布</span>');
-						$('#p_chastatus_' + type + '_' + id).parent().html('<a href="javascript:;" id="p_chastatus_2_' + id + '" class="btn">删除</a>');
+						parentObj.html('<a href="javascript:;" id="p_chastatus_2_' + id + '" class="btn">删除</a>');
+						$('#rid_' + id).removeAttr('disabled');
 					}
 				}
 				else
-					$('#p_chastatus_' + type + '_' + id).parent().html('<span class="label warning">Oops..' + data['msg'] + '</span>');
+					parentObj.html('<span class="label warning">Oops..' + data['msg'] + '</span>');
 			});
 		});
 
@@ -314,7 +318,8 @@ define(function(require, exports, module){
 						var listTr = '';
 						for(var i = 0, j = ls.length; i < j; i++)
 						{
-							listTr += '<tr><td><input type="checkbox" name="package" value="' + ls[i].r_id + '"/></td>';
+							var dis = ls[i].r_status != 1 ? ' disabled = "disabled" ' : ' ';
+							listTr += '<tr><td><input type="checkbox" name="package"' + dis + 'id="rid_' + ls[i].r_id + '" value="' + ls[i].r_id + '"/></td>';
 							listTr += '<td><a href="javascript:;" id="p_detail_' + ls[i].r_id + '">' + ls[i].r_no + '</a></td>';
 							listTr += '<td>' + getLocalTime(ls[i].r_cdateline) + '</td><td id="status_' + ls[i].r_id + '">';
 							if(ls[i].r_status == 1)
@@ -360,6 +365,7 @@ define(function(require, exports, module){
 			$('#pcurid').val(pId);
 			getPackageList(pId, page);
 			//取得服务器列表
+			getServerList(pId);
 		}
 
 		function getLocalTime(nS)
@@ -385,5 +391,62 @@ define(function(require, exports, module){
             if(prev > 0 && next < max)
                 return min > 0 ? [prev, next] : [prev, max];
         }
+
+		//取得服务器列表
+		function getServerList(pId)
+		{
+			$('#tserver').ready(function(){
+				$('#tserver').html('<option value="">请选择</option>');
+				$.getJSON('/servers/shortlist/' + pId, function(data){
+					if(data['res'] == 1)
+					{
+						var ls = data['list'];
+						var listOpt = [];
+						for(var i = 0, j = ls.length; i < j; i++)
+						{
+							listOpt.push('<option value="' + ls[i].s_id + '">' + ls[i].s_name + '</option>');
+						}
+						$('#tserver').append(listOpt.join(''));
+					}
+					else
+					{
+						$('a[id^="action_"]').addClass('disabled').die();
+						std.alertErrorBox('listtable', data['msg']);
+					}
+				});
+			});
+		}
+
+		$('a[id^="action_"]').live('click', function(){
+			var releId = 'action_prele';
+			var rollId = 'action_proll';
+			var id = $(this).attr('id');
+			id == releId ? $('#' + rollId).die('click') : $('#' + releId).die('click');
+			std.active(id);
+			var checkboxs = $('input[name="package"]:checked');
+			var tSer = $('#tserver').val();
+			if(checkboxs.length <= 0 || !tSer)
+			{
+				std.alertErrorBox('listtable', '请至少选择一项并且选择对应的目标服务器');
+				std.resetActive(id);
+				return false;
+			}
+
+			//开始发布
+			var sValues = new Array();
+			checkboxs.each(function(){sValues.push($(this).val());});
+			$('#listtable').before('<div class="alert-message block-message info" id="proccess_info"><a href="javascript:;" id="goingclose" class="close">X</a><h4>操作正在进行中...</h4></div>');
+			$('#proccess_info > h4').append('<iframe width="900" height="200" frameborder="no" allowTransparency="true" scrolling="no" id="going" src="/project/actioning/' + tSer + '/' + sValues.join('|') + '"></iframe>');
+			$('#going').ready(function(){setInterval(function(){var ih = $('#going').contents().find('body').height();if(ih >= 200) $('#going').attr('height',ih);}, 1000);});
+		});
+
+		$('#goingclose').live('click', function(){
+			if(confirm('请不要轻易中断，这样可能造成数据发布混乱...'))
+			{
+				$(this).parent().remove();
+				std.resetActive('action_prele');
+				std.resetActive('action_proll');
+			}
+		});
 	};
 });

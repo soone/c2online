@@ -22,6 +22,7 @@ urls = (
 		'/packlist/(.+)/(\d*)', 'PackList',
 		'/packdetail/(\d+)', 'PackDetail',
 		'/packstatus/(\d+)/(\d+)', 'PackStatus',
+		'/actioning/(\d+)/(.+)', 'Actioning',
         )
 render = config.render
 appProject = web.application(urls, globals())
@@ -35,7 +36,7 @@ class Project:
 		try:
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
-			plist = db.select('c2_project', order='p_status, p_cdateline desc')
+			plist = db.select('c2_project', order='p_status asc, p_cdateline desc')
 			if len(plist) == 0:
 				plist = ''
 			return render.project(plist = plist, ac = 2)
@@ -292,10 +293,34 @@ class ShortList:
 		try:
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
-			plist = db.select('c2_project', what = 'p_id, p_name', order='p_status, p_cdateline desc')
+			plist = db.select('c2_project', what = 'p_id, p_name', where = 'p_status = 1', order='p_cdateline desc')
 			if len(plist) == 0:
 				return json.dumps({'res' : 0, 'msg' : '暂无项目，请先创建项目'})
 
 			return json.dumps({'res' : 1, 'list' : [l for l in plist]})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '项目列表读取失败'})
+
+class Actioning:
+	def GET(self, serId, packageId):
+		web.header('Content-type', 'text/html;charset=UTF-8')
+		web.header("Cache-Control", "no-cache, must-revalidate")
+		web.header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT")
+		v = valids.Valids()
+		pkId = packageId.strip()
+		sId = serId.strip()
+		if v.isEmpty(pkId) or v.isEmpty(sId):
+			yield '请选择要发布的版本包和对应的目标服务器，并点击右上角的X重新发布'
+			return
+
+		try:
+			#取的目标服务器信息和对应的项目id
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			sInfo = db.select('c2_server', what = '*', where = 's_id = $sId AND s_status = 1', limit = 1, vars = locals())
+			if len(sInfo) == 0:
+				yield '选择的服务器被关闭或者不存在'
+				return
+			ids = pkId.split('|')
+		except:
+			yield '服务器故障，请点击右上角的X重新发布'

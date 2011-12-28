@@ -19,8 +19,9 @@
 	<thead>
 		<tr>
 			<th>#</th>
-			<th>名称</th>
-			<th>服务器详情</th>
+			<th>服务器名称</th>
+			<th>对应项目</th>
+			<th>详情</th>
 			<th>创建时间</th>
 			<th>状态</th>
 		</tr>
@@ -35,6 +36,7 @@
 		<tr>
 			<td><input type="checkbox" name="scheck" value="${s.s_id}"/></td>
 			<td>${s.s_name}</td>
+			<td>${s.p_name}</td>
 			<td>
 				<ul class="unstyled">
 					<li><span class="blue">生产地址：</span><span id="ser_pdir_${s.s_id}">${s.s_pdir}</span></li>
@@ -63,7 +65,7 @@
 	</tbody>
 	<tfoot>
 		<tr>
-			<td colspan="5">
+			<td colspan="6">
 				<button class="btn" id="sopen">打开</button>
 				<button class="btn" id="sclose">关闭</button>
 				<a class="btn large primary" href="javascript:;" id="createser">创建服务器</a>

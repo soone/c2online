@@ -14,9 +14,9 @@ urls = (
 		'/create/', 'Create',
 		'/change/', 'Change',
 		'/update/', 'Update',
-		'/test/(.*)', 'Test',
-		'/test1/', 'Test1',
-        )
+		'/shortlist/(\d*)', 'ShortList',
+)
+
 render = config.render
 appServers = web.application(urls, globals())
 
@@ -60,6 +60,12 @@ class Create:
 		try:
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
+			#查看pid是否真实存在
+			res = db.select('c2_project', what = 'p_name', where = 'p_id = $pId', limit = 1, vars = locals())
+			if len(res) < 1:
+				return json.dumps({'res' : 0, 'msg' : '对应项目不存在'})
+
+			pname = res[0].p_name
 			#查看是否重名
 			rs = db.select('c2_server', what = 's_id', where = 's_name = $sname', limit = 1, vars = locals())
 			if len(rs) > 0:
@@ -73,7 +79,8 @@ class Create:
 					's_pdir' : pdir, 
 					's_bdir' : bdir, 
 					's_cdateline' : time.time(), 
-					's_status' : 1}
+					's_status' : 1,
+					'p_name' : pname}
 			if 'svpn' in inputs:
 				pData['s_vpn'] = inputs['svpn'].strip()
 
@@ -150,15 +157,22 @@ class Update:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Test1:
-	def GET(self):
-		return render.servers(ac = 3)
+class ShortList:
+	def GET(self, pId):
+		'''取数据库服务器列表信息'''
+		v = valids.Valids()
+		pId = pId.strip()
+		if v.isEmpty(pId):
+			return json.dumps({'res' : 0, 'msg' : '参数不合法'})
 
-class Test:
-	def GET(self, count):
-		web.header('Content-type', 'text/html;charset=UTF-8')
-		web.header("Cache-Control", "no-cache, must-revalidate")
-		web.header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT")
-		for i in range(50):
-			time.sleep(1)
-			yield str(i) + "<br/>"
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			plist = db.select('c2_server', what = 's_id, s_name', where = 's_status = 1 AND p_id = $pId', order='s_cdateline desc', vars = locals())
+			if len(plist) == 0:
+				return json.dumps({'res' : 0, 'msg' : '暂无服务器列表，请先创建服务器'})
+
+			return json.dumps({'res' : 1, 'list' : [l for l in plist]})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '服务器列表读取失败'})
+

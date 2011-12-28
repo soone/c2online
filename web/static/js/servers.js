@@ -5,20 +5,6 @@ define(function(require, exports, module){
     var createser = '<ul class="breadcrumb"><li><a href="/servers">服务器管理</a><span class="divider">/</span></li><li class="active">创建服务器</li></ul><form class="form-stacked" id="serform"><fieldset><div class="clearfix"><label for="pid">所属项目*</label><div class="input"><select name="pid" id="pid"><option value="">请选择</option></select></div></div><div class="clearfix"><label for="sname">名称*</label><div class="input"><input type="text" id="sname" class="xlarge" size="30" name="sname" /></div></div><div class="clearfix"><label for="pdir">生产地址*</label><div class="input"><input type="text" id="pdir" class="span8" size="256" name="pdir" /><span class="help-block">比如：/data/wwwV2/</span></div></div><div class="clearfix"><label for="pdir">备份地址*</label><div class="input"><input type="text" id="bdir" class="span8" size="256" name="bdir" /><span class="help-block">比如：/data/release/</span></div></div><div class="clearfix"><label for="spath">Host地址*</label><div class="input"><input type="text" id="spath" class="span8" size="256" name="spath" /><span class="help-block">比如：192.168.1.253</span></div></div><div class="clearfix"><label for="suser">用户名*</label><div class="input"><input type="text" id="suser" name="suser" /></div></div><div class="clearfix"><label for="spass">密码*</label><div class="input"><input type="password" id="spass" name="spass" /></div></div><div class="clearfix"><label for="vpnpro">vpn网关</label><div class="input"><select name="vpnpro" class="mini"><option value="1">PPTP</option></select>&nbsp;<input type="text" placeholder="192.168.1.253" id="svpn" class="span5" size="256" name="svpn" /></div></div><div class="clearfix"><label for="vpnname">vpn帐号</label><div class="input"><input type="text" id="vpnname" name="vpnname" /></div></div><div class="clearfix"><label for="vpnpass">vpn密码</label><div class="input"><input type="password" id="vpnpass" name="vpnpass" /></div></div></fieldset><div class="actions"><button class="btn primary" id="sersubmit">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
 
 	exports.init = function(){
-		//$('#c11').live('click',function(){
-		//	$('#c2').html('<iframe id="iframe1" height="200" width="1000" src="/servers/test/"></iframe>');
-		//});
-
-		//$('#iframe1').ready(function(){
-		//	setInterval(function(){
-		//		var  ih = $('#iframe1').contents().find('body').height();
-		//scrollHeight
-		//		if(ih >= 200)
-		//			$('#iframe1').attr('height',ih);
-		//	}, 1000);
-		//	setInterval(function(){alert($('#iframe1').attr('height'));}, 100000);
-		//});
-
 		//显示创建表单
         $('#createser').live('click', function(){
 			$('#main').hide().fadeIn('slow').html(createser);
@@ -39,7 +25,7 @@ define(function(require, exports, module){
 		$('#cancel').live('click', function(){var cancel = std.cancel('main', main);});
 		//提交创建表单
 		$('#serform').live('submit', function(){
-			std.active($('#sersubmit'));
+			std.active('sersubmit');
 			$('#sersubmit').attr('disabled', true);
 			var postData ={};
 			postData.sname = $('#sname').val();
@@ -52,7 +38,7 @@ define(function(require, exports, module){
 			if(std.validAllNotEmpty(postData) == false)
 			{
 				std.alertErrorBox('serform', '带*号不能为空');
-				std.resetActive($('#sersubmit'));
+				std.resetActive('sersubmit');
 				return false;
 			}
 
@@ -64,7 +50,7 @@ define(function(require, exports, module){
 				if(data['res'] == 0)
 				{
 					std.alertErrorBox('serform', data['msg']);
-					std.resetActive($('#sersubmit'));
+					std.resetActive('sersubmit');
 					return false;
 				}
 				else
@@ -105,12 +91,13 @@ define(function(require, exports, module){
 
 		//服务器列表状态修改函数
 		function changeStatus(obj, status){
-			std.active(obj);
+			var id = $(obj).attr('id');
+			std.active(id);
 			var checkboxs = $('input[name="scheck"]:checked');
 			if(!checkboxs.length)
 			{
 				std.alertErrorBox('slist', '请至少选择一项');
-				std.resetActive(obj);
+				std.resetActive(id);
 				return false;
 			}
 
@@ -120,7 +107,7 @@ define(function(require, exports, module){
 				if(!data['res'])
 				{
 					std.alertErrorBox('slist', data['msg']);
-					std.resetActive(obj);
+					std.resetActive(id);
 				}
 				else
 					location.href = "/servers/";
