@@ -210,7 +210,6 @@ define(function(require, exports, module){
 			var pro = $('#pcurid').val();
 			var cVals = [];
 			checkboxs.each(function(){cVals.push($(this).val())});
-			alert(cVals.join('|'));
 			std.getJson('post', '/project/package/', {verno : version, pro : pro, vals : cVals.join('|')}, function(data){
 				if(data['res'] == 0)
 				{

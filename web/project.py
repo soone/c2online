@@ -9,6 +9,7 @@ from modules import valids
 from modules import vcs
 from modules import vcspack
 import math
+import hashlib
 
 urls = (
 		'', 'ReProject',
@@ -313,14 +314,27 @@ class Actioning:
 			yield '请选择要发布的版本包和对应的目标服务器，并点击右上角的X重新发布'
 			return
 
-		try:
-			#取的目标服务器信息和对应的项目id
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			sInfo = db.select('c2_server', what = '*', where = 's_id = $sId AND s_status = 1', limit = 1, vars = locals())
-			if len(sInfo) == 0:
-				yield '选择的服务器被关闭或者不存在'
-				return
-			ids = pkId.split('|')
-		except:
-			yield '服务器故障，请点击右上角的X重新发布'
+		#try:
+		#取的目标服务器信息和对应的项目id
+		dbase = dbHelp.DbHelp()
+		db = dbase.database()
+		sInfo = db.select('c2_server', what = '*', where = 's_id = $sId AND s_status = 1', limit = 1, vars = locals())
+		if len(sInfo) == 0:
+			yield '选择的服务器被关闭或者不存在'
+			return
+
+		packDir = config.PACKAGEROOT % (hashlib.new('md5', str(sInfo[0].p_id)).hexdigest()[8: -8])
+		ids = pkId.split('|')
+		#查看包id对应的项目id是否正确
+		pInfo = db.select('c2_revision', what = 'r_id, r_no', where = 'r_status = 1 AND r_id IN $ids', order = 'r_id ASC', vars = locals())
+		if len(pInfo) != len(ids):
+			yield '发布包数量不正确，请点击右上角的X重新选择发布'
+			return
+
+		#发布开始
+		#判断包是否都已经存在，不存在则从数据库读取重新打包
+		for p in pInfo:
+			yield p.r_id
+			yield p.r_no
+		#except:
+		#	yield '服务器故障，请点击右上角的X重新发布'
