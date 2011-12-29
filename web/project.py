@@ -10,6 +10,8 @@ from modules import vcs
 from modules import vcspack
 import math
 import hashlib
+import os
+from modules import vpndialup
 
 urls = (
 		'', 'ReProject',
@@ -307,11 +309,12 @@ class Actioning:
 		web.header('Content-type', 'text/html;charset=UTF-8')
 		web.header("Cache-Control", "no-cache, must-revalidate")
 		web.header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT")
+		yield '<style>body{font-size:14px}</style>'
 		v = valids.Valids()
 		pkId = packageId.strip()
 		sId = serId.strip()
 		if v.isEmpty(pkId) or v.isEmpty(sId):
-			yield '请选择要发布的版本包和对应的目标服务器，并点击右上角的X重新发布'
+			yield '<div>请选择要发布的版本包和对应的目标服务器，并点击右上角的X重新发布</div>'
 			return
 
 		#try:
@@ -320,21 +323,51 @@ class Actioning:
 		db = dbase.database()
 		sInfo = db.select('c2_server', what = '*', where = 's_id = $sId AND s_status = 1', limit = 1, vars = locals())
 		if len(sInfo) == 0:
-			yield '选择的服务器被关闭或者不存在'
+			yield '<div>选择的服务器被关闭或者不存在</div>'
 			return
 
-		packDir = config.PACKAGEROOT % (hashlib.new('md5', str(sInfo[0].p_id)).hexdigest()[8: -8])
+		#查看项目信息看项目是否可用
+		serInfo = dict(sInfo[0])
+		proId = serInfo['p_id']
+		proInfo = db.select('c2_project', what = '*', where = 'p_id = $proId AND p_status = 1', limit = 1, vars = locals())
+		if len(proInfo) == 0:
+			yield '<div>对应的项目不可用，请检查项目状态</div>'
+
+		projectInfo = dict(proInfo[0])
+
+		packDir = config.PACKAGEROOT % (hashlib.new('md5', str(serInfo['p_id'])).hexdigest()[8 : -8])
 		ids = pkId.split('|')
-		#查看包id对应的项目id是否正确
+		##查看包id对应的项目id是否正确
 		pInfo = db.select('c2_revision', what = 'r_id, r_no', where = 'r_status = 1 AND r_id IN $ids', order = 'r_id ASC', vars = locals())
 		if len(pInfo) != len(ids):
-			yield '发布包数量不正确，请点击右上角的X重新选择发布'
+			yield '<div>发布包数量不正确，请点击右上角的X重新选择发布</div>'
 			return
 
 		#发布开始
 		#判断包是否都已经存在，不存在则从数据库读取重新打包
-		for p in pInfo:
-			yield p.r_id
-			yield p.r_no
+		yield '<div>检测发布包状态...</div>'
+		rePack = []
+		packInfo = [dict(p) for p in pInfo]
+		vPack = vcspack.VcsPack(**{'vpath' : projectInfo['p_vcspath'], 'vuser' : projectInfo['p_user'], 'vpass' : projectInfo['p_pass'], 'vid' : proId})
+		for p in packInfo:
+			if os.path.isfile(packDir + '%s.tar.gz' % p['r_no']) is False:
+				rePack.append([p['r_id'], p['r_no']])
+				yield ('<div style="color:#f30">检测到<b>%s</b>版本发布包不正常，将重新打包...</div>' % str(p['r_no']))
+				#重新打包
+				yield ('<div>正在重新打包...</div>')
+				#重新从数据库读取打包列表
+				rId = p['r_id']
+				pkList = db.select('c2_files', what = 'f_action, f_path, f_ver', where = 'r_id = $rId', vars = locals())
+				if len(pkList) == 0:
+					yield ('<div style="color:#f30">该版本不存在打包文件，将放弃重新打包</div>')
+					continue
+
+				vPack.goPack([{'f_path' : v.f_path, 'f_action' : v.f_action, 'f_ver' : v.f_ver} for v in pkList], p['r_no'])
+				yield ('<div style="color:#86cc12"><b>%s</b>重新打包完毕...</div>' % str(p['r_no']))
+			else:
+				yield ('<div style="color:#86cc12"><b>%s</b>版本发布包正常</div>' % str(p['r_no']))
+		#看是否需要拨号
+		if v.isEmpty(serInfo['s_vpn']) is False and v.isEmpty(serInfo['s_vpnuser']) is False and v.isEmpty(serInfo['s_vpnpass']) is False:
+			yield '<div>开始vpn拨号...</div>'
 		#except:
 		#	yield '服务器故障，请点击右上角的X重新发布'

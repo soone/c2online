@@ -8,7 +8,7 @@ import pysvn
 class VcsPack:
 	'''专门打包从版本库抽象出来的文件'''
 	def __init__(self, **v):
-		self.dirs = config.PACKAGEROOT % (hashlib.new('md5', v['vid']).hexdigest()[8:-8])
+		self.dirs = config.PACKAGEROOT % (hashlib.new('md5', str(v['vid'])).hexdigest()[8:-8])
 		self.pv = vcs.Vcs(vPath = v['vpath'], vUser = v['vuser'], vPass = v['vpass'])
 		self.hostUrl = v['vpath']
 
@@ -17,12 +17,16 @@ class VcsPack:
 		self.verNo = verNo
 		self.tempPackDir = self.dirs + self.verNo
 		self.sourceDir = self.tempPackDir + '/source'
+		print '1'
 		#打包前准备
 		self.expack(vList)
+		print '2'
 		#从版本库导出文件
 		self.vcsExport(vList)
+		print '3'
 		#压缩并打包和清理
 		self.clear()
+		print '4'
 		return True
 
 	def expack(self, vList):

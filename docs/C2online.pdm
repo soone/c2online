@@ -2714,7 +2714,7 @@ Shadow=0</a:DisplayPreferences>
 <o:ReferenceSymbol Id="o5">
 <a:CreationDate>1323084537</a:CreationDate>
 <a:ModificationDate>1323098236</a:ModificationDate>
-<a:Rect>((-15049,9903), (15821,11224))</a:Rect>
+<a:Rect>((-15049,9903), (15821,11349))</a:Rect>
 <a:ListOfPoints>((15821,10128),(-15049,10128))</a:ListOfPoints>
 <a:CornerStyle>2</a:CornerStyle>
 <a:ArrowStyle>1</a:ArrowStyle>
@@ -2756,7 +2756,7 @@ CARD 0 新宋体,8,N</a:FontList>
 <o:ReferenceSymbol Id="o12">
 <a:CreationDate>1323097643</a:CreationDate>
 <a:ModificationDate>1323160887</a:ModificationDate>
-<a:Rect>((9518,-2967), (23604,3212))</a:Rect>
+<a:Rect>((9518,-3092), (23604,3212))</a:Rect>
 <a:ListOfPoints>((9518,-1871),(19854,-1871),(19854,3212))</a:ListOfPoints>
 <a:CornerStyle>2</a:CornerStyle>
 <a:ArrowStyle>1</a:ArrowStyle>
