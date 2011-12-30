@@ -370,6 +370,10 @@ class Actioning:
 
 			try:
 				sl = serlink.SerLink(host = serInfo['s_host'], user = serInfo['s_user'], pw = serInfo['s_pass'], bdir = serInfo['s_bdir'], pdir = serInfo['s_pdir'])
+				if v.isEmpty(serInfo['s_vpn']) is False and v.isEmpty(serInfo['s_vpnuser']) is False and v.isEmpty(serInfo['s_vpnpass']) is False:
+					yield '<div>开始拨号连接...</div>'
+					yield '<div>' + sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass']}) + '</div>'
+
 				#拷贝包文件到目标服务器
 				yield '<div>拷贝包文件到目标服务器<b>%s</b>...</div>' % str(serInfo['s_host'])
 				sl.scpSend([packDir + '%s.tar.gz' % p['r_no'] for p in packInfo])
@@ -381,6 +385,8 @@ class Actioning:
 				if relRs.find('[ERROR]') == -1:
 					ids = [p['r_id'] for p in packInfo]
 					db.update('c2_revision', r_dateline = time.time(), r_status = 3, s_id = serInfo['s_id'], s_name = serInfo['s_name'], where = 'r_id IN $ids AND r_status = 1', vars=locals())
+
+					db.multiple_insert('c2_log', [{'s_id' : serInfo['s_id'], 's_name' : serInfo['s_name'], 'r_id' : p['r_id'], 'r_id' : p['r_no'], 'r_dateline' : time.time()} for p in packInfo])
 			except Exception, e:
 				yield '<div style="color:#f30">' + str(e) + '</div>'
 				return 
