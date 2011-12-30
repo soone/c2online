@@ -50,6 +50,10 @@ class Rollback:
 
 def usage():
 	print 'Usage:python rollback.py 2.0.15.r8888 /data/server/a0b923820dcc509a /data/wwwV2'
+	print 'Usage:python rollback.py "3.0.16.r1888 2.0.15.r8888" /data/server/a0b923820dcc509a /data/wwwV2'
+
+def main():
+	pass
 
 if __name__ == '__main__':
 	if len(sys.argv) < 4:
