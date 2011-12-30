@@ -124,9 +124,9 @@ class Update:
 		val = inputs['val'].strip()
 		v = valids.Valids()
 
-		if v.isEmpty(name) or \
+		if (v.isEmpty(name) or \
 			v.isEmpty(id) or \
-			v.isEmpty(val):
+			v.isEmpty(val)) and name.find('vpn') == -1:
 			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
 
 		#修改数据

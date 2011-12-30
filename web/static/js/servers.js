@@ -75,8 +75,8 @@ define(function(require, exports, module){
 		$('input[id^="edit_"]').live('blur', function(){
 			var val = $(this).val();
 			var id = $(this).attr('id');
-			if(!val){
-				std.alertErrorBox('tlist', '该值不能为空');
+			if(!val && id.indexOf('vpn') == -1){
+				std.alertErrorBox('slist', '该值不能为空');
 				return false;
 			}
 

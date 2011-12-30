@@ -5,10 +5,10 @@ import sys
 FILELOG = 'files.log'
 PRESHELL = 'pre.sh'
 class Server:
-	def __init__(self):
-		self.verNo = sys.argv[1]
-		self.relDir = sys.argv[2]
-		self.wwwDir = sys.argv[3]
+	def __init__(self, verNo, relDir, wwwDir):
+		self.verNo = verNo
+		self.relDir = relDir
+		self.wwwDir = wwwDir
 		#解压压缩包
 		os.system('mkdir -p %s/%s' % (self.relDir, self.verNo))
 		os.system('tar zxvf %s/%s.tar.gz -C %s/%s' % (self.relDir, self.verNo, self.relDir, self.verNo))
@@ -80,22 +80,29 @@ class Server:
 
 def usage():
 	print 'Usage:python release.py 2.0.15.r8888 /data/server/a0b923820dcc509a /data/wwwV2'
+	print 'Usage:python release.py "2.0.15.r8888 20111221" /data/server/a0b923820dcc509a /data/wwwV2'
 
-if __name__ == '__main__':
+def main():
 	if len(sys.argv) < 4:
 		usage()
 		sys.exit(2)
 
-	ser = Server()
+	for verNo in sys.argv[1].split(' '):
+		ser = Server(verNo, sys.argv[2], sys.argv[3])
 
-	print '发布前备份文件...'
-	if ser.backup() == False:
-		print 'log文件不存在，备份失败'
-		sys.exit(2)
+		print '发布<b>%s</b>版本前备份文件...' % verNo
+		if ser.backup() == False:
+			print '[ERROR]log文件不存在，<b>%s</b>版本备份失败，将停止整个发布过程，请检查' % verNo
+			sys.exit(2)
 
-	print '开始发布...'
-	if ser.release() == False:
-		print ''
-		sys.exit(2)
-	print '发布清理...'
-	ser.clear()
+		print '开始发布<b>%s</b>版本...' % verNo
+		if ser.release() == False:
+			print '[ERROR]发布<b>%s</b>失败，将停止整个发布过程，请检查' % verNo
+			sys.exit(2)
+		print '发布后清理...'
+		ser.clear()
+		print '<b>%s</b>版本发布成功' % verNo
+
+
+if __name__ == '__main__':
+	main()

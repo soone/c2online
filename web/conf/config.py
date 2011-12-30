@@ -21,3 +21,7 @@ DBINFO = {
 #打包根目录
 PACKAGEROOT = os.path.abspath('../') + "/packdir/%s/"
 PACKAGEFILES = 'files.log'
+#发布的脚本名称
+RELEASENAME = 'bin/release.py'
+#回滚的脚本名称
+ROLLBACKNAME = 'bin/rollback.py'

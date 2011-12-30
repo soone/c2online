@@ -17,16 +17,12 @@ class VcsPack:
 		self.verNo = verNo
 		self.tempPackDir = self.dirs + self.verNo
 		self.sourceDir = self.tempPackDir + '/source'
-		print '1'
 		#打包前准备
 		self.expack(vList)
-		print '2'
 		#从版本库导出文件
 		self.vcsExport(vList)
-		print '3'
 		#压缩并打包和清理
 		self.clear()
-		print '4'
 		return True
 
 	def expack(self, vList):

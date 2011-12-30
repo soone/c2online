@@ -436,15 +436,14 @@ define(function(require, exports, module){
 			checkboxs.each(function(){sValues.push($(this).val());});
 			$('#listtable').before('<div class="alert-message block-message info" id="proccess_info"><a href="javascript:;" id="goingclose" class="close">X</a><h4>操作正在进行中...</h4></div>');
 			$('#proccess_info > h4').append('<iframe width="900" height="200" frameborder="no" allowTransparency="true" scrolling="no" id="going" src="/project/actioning/' + tSer + '/' + sValues.join('|') + '"></iframe>');
-			$('#going').ready(function(){setInterval(function(){var ih = $('#going').contents().find('body').height();if(ih >= 200) $('#going').attr('height',ih);}, 1000);});
+			$('#going').ready(function(){setInterval(function(){var ih = $('#going').contents().find('body').height();if(ih >= 200) $('#going').attr('height', ih+50);}, 1000);});
 		});
 
 		$('#goingclose').live('click', function(){
 			if(confirm('请不要轻易中断，这样可能造成数据发布混乱...'))
 			{
 				$(this).parent().remove();
-				std.resetActive('action_prele');
-				std.resetActive('action_proll');
+				showPackList($('#pname').text(), $('#pcurid').val(), parseInt($('div[id="pagebar"] > ul > li.active').text()));
 			}
 		});
 	};
