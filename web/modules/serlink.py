@@ -4,6 +4,7 @@ import pexpect
 import pxssh
 from conf import config
 import subprocess
+import hashlib
 
 class SerLink:
 	'''本地服务器和目标服务器交互的助手类'''
@@ -15,10 +16,28 @@ class SerLink:
 		self.pdir = sInfo['pdir']
 	
 	def vpnConnect(self, **v):
+		'''vpn拨号开始'''
 		self.vpn = v['vpn']
-		self.vpnuser = v['user']
-		self.vpnpw = v['pw']
-		return 'hello'
+		self.vpnUser = v['user']
+		self.vpnPw = v['pw']
+		self.vpnType = v['type']
+		if self.vpnType == 1:
+			child = pexpect.spawn(config.PPTPCONNECTCMD % (hashlib.new('md5', self.vpn).hexdigest()[8 : -8], self.vpn, self.vpnUser, self.vpnPw))
+			child.sendline('181633139')
+
+		child.expect(pexpect.EOF)
+		res = child.before.replace('\n', '<br />')
+		return res
+
+	def vpnClose(self):
+		'''vpn关闭'''
+		if self.vpnType == 1:
+			child = pexpect.spawn(config.PPTPCLOSECMD % hashlib.new('md5', self.vpn).hexdigest()[8 : -8])
+			child.sendline('181633139')
+
+		child.expect(pexpect.EOF)
+		res = child.before.replace('\n', '<br />')
+		return res
 
 	def scpSend(self, files):
 		'''scp发送文件'''

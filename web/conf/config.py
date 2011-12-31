@@ -25,3 +25,6 @@ PACKAGEFILES = 'files.log'
 RELEASENAME = 'bin/release.py'
 #回滚的脚本名称
 ROLLBACKNAME = 'bin/rollback.py'
+#pptp拨号命令
+PPTPCONNECTCMD = 'sudo pptpsetup --create %s --server %s --username %s --password %s --encrypt --start'
+PPTPCLOSECMD = 'sudo poff %s'

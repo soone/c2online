@@ -11,7 +11,6 @@ from modules import vcspack
 import math
 import hashlib
 import os
-from modules import vpndialup
 from modules import serlink
 
 urls = (
@@ -339,7 +338,7 @@ class Actioning:
 			packDir = config.PACKAGEROOT % (hashlib.new('md5', str(serInfo['p_id'])).hexdigest()[8 : -8])
 			ids = pkId.split('|')
 			##查看包id对应的项目id是否正确
-			pInfo = db.select('c2_revision', what = 'r_id, r_no', where = 'r_status = 1 AND r_id IN $ids', order = 'r_id ASC', vars = locals())
+			pInfo = db.select('c2_revision', what = 'r_id, r_no', where = 'r_status <> 2 AND r_id IN $ids', order = 'r_id ASC', vars = locals())
 			if len(pInfo) != len(ids):
 				yield '<div>发布包数量不正确，请点击右上角的X重新选择发布</div>'
 				return
@@ -370,9 +369,14 @@ class Actioning:
 
 			try:
 				sl = serlink.SerLink(host = serInfo['s_host'], user = serInfo['s_user'], pw = serInfo['s_pass'], bdir = serInfo['s_bdir'], pdir = serInfo['s_pdir'])
-				if v.isEmpty(serInfo['s_vpn']) is False and v.isEmpty(serInfo['s_vpnuser']) is False and v.isEmpty(serInfo['s_vpnpass']) is False:
+				isVpn = (v.isEmpty(serInfo['s_vpn']) == False) and (v.isEmpty(serInfo['s_vpnuser']) == False) and (v.isEmpty(serInfo['s_vpnpass']) == False)
+				if isVpn:
 					yield '<div>开始拨号连接...</div>'
-					yield '<div>' + sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass']}) + '</div>'
+					vpnRs = sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro']})
+					yield '<div>%s</div>' % str(vpnRs)
+					if vpnRs.find('succeeded') == -1:
+						yield '<div style="color:#f30">vpn拨号失败，请重试</div>'
+						return
 
 				#拷贝包文件到目标服务器
 				yield '<div>拷贝包文件到目标服务器<b>%s</b>...</div>' % str(serInfo['s_host'])
@@ -384,9 +388,13 @@ class Actioning:
 				#没有错误和失败则更新版本包状态为已发布
 				if relRs.find('[ERROR]') == -1:
 					ids = [p['r_id'] for p in packInfo]
-					db.update('c2_revision', r_dateline = time.time(), r_status = 3, s_id = serInfo['s_id'], s_name = serInfo['s_name'], where = 'r_id IN $ids AND r_status = 1', vars=locals())
-
-					db.multiple_insert('c2_log', [{'s_id' : serInfo['s_id'], 's_name' : serInfo['s_name'], 'r_id' : p['r_id'], 'r_id' : p['r_no'], 'r_dateline' : time.time()} for p in packInfo])
+					db.update('c2_revision', r_dateline = time.time(), r_status = 3, s_id = serInfo['s_id'], s_name = serInfo['s_name'], where = 'r_id IN $ids AND r_status <> 2', vars=locals())
+					db.multiple_insert('c2_log', [{'s_id' : serInfo['s_id'], 's_name' : serInfo['s_name'], 'r_id' : p['r_id'], 'r_no' : p['r_no'], 'r_dateline' : time.time()} for p in packInfo])
+				
+				if isVpn:
+					#关闭vpn链接
+					sl.vpnClose()
+					yield  'vpn关闭'
 			except Exception, e:
 				yield '<div style="color:#f30">' + str(e) + '</div>'
 				return 

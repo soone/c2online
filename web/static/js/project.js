@@ -317,7 +317,7 @@ define(function(require, exports, module){
 						var listTr = '';
 						for(var i = 0, j = ls.length; i < j; i++)
 						{
-							var dis = ls[i].r_status != 1 ? ' disabled = "disabled" ' : ' ';
+							var dis = ls[i].r_status == 2 ? ' disabled = "disabled" ' : ' ';
 							listTr += '<tr><td><input type="checkbox" name="package"' + dis + 'id="rid_' + ls[i].r_id + '" value="' + ls[i].r_id + '"/></td>';
 							listTr += '<td><a href="javascript:;" id="p_detail_' + ls[i].r_id + '">' + ls[i].r_no + '</a></td>';
 							listTr += '<td>' + getLocalTime(ls[i].r_cdateline) + '</td><td id="status_' + ls[i].r_id + '">';
