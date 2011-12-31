@@ -380,7 +380,14 @@ class Actioning:
 
 				#拷贝包文件到目标服务器
 				yield '<div>拷贝包文件到目标服务器<b>%s</b>...</div>' % str(serInfo['s_host'])
-				sl.scpSend([packDir + '%s.tar.gz' % p['r_no'] for p in packInfo])
+				scpRs = sl.scpSend([packDir + '%s.tar.gz' % p['r_no'] for p in packInfo])
+				if scpRs.find('ERROR') != -1:
+					yield '<div style="color:#f30">发布包上传失败，请联系管理员</div>'
+					if isVpn:
+						sl.vpnClose()
+						yield 'vpn关闭'
+					return
+
 				yield '<div style="color:#86cc12">发布包上传成功</div>'
 				yield '<div>开始在目标服务器操作...</div>'
 				relRs = sl.sshRelese([p['r_no'] for p in packInfo])
@@ -394,7 +401,7 @@ class Actioning:
 				if isVpn:
 					#关闭vpn链接
 					sl.vpnClose()
-					yield  'vpn关闭'
+					yield 'vpn关闭'
 			except Exception, e:
 				yield '<div style="color:#f30">' + str(e) + '</div>'
 				return 

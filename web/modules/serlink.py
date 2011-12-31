@@ -24,6 +24,7 @@ class SerLink:
 		if self.vpnType == 1:
 			child = pexpect.spawn(config.PPTPCONNECTCMD % (hashlib.new('md5', self.vpn).hexdigest()[8 : -8], self.vpn, self.vpnUser, self.vpnPw))
 			child.sendline('181633139')
+			#child.sendline('sudo /sbin/route add -net 192.168.10.0 netmask 255.255.255.0 dev ppp0')
 
 		child.expect(pexpect.EOF)
 		res = child.before.replace('\n', '<br />')
@@ -50,6 +51,7 @@ class SerLink:
 		
 		child.sendline(self.pw)
 		child.expect(pexpect.EOF)
+		return True
 
 	def sshRelese(self, verNos):
 		'''登录目标服务器运行发布脚本'''
