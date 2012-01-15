@@ -21,24 +21,31 @@ class SerLink:
 		self.vpnUser = v['user']
 		self.vpnPw = v['pw']
 		self.vpnType = v['type']
+		self.vpnRoute = v['route'][0 : v['route'].rindex('.')]
+		res = []
 		if self.vpnType == 1:
-			child = pexpect.spawn(config.PPTPCONNECTCMD % (hashlib.new('md5', self.vpn).hexdigest()[8 : -8], self.vpn, self.vpnUser, self.vpnPw))
-			child.sendline('181633139')
-			#child.sendline('sudo /sbin/route add -net 192.168.10.0 netmask 255.255.255.0 dev ppp0')
+			p = subprocess.Popen(config.PPTPCONNECTCMD % (hashlib.new('md5', self.vpn).hexdigest()[8 : -8], self.vpn, self.vpnUser, self.vpnPw), shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+			while True:
+				rs = p.stdout.readline()
+				if rs == '' or p.poll() != None:
+					break
+				else:
+					res.append(rs)
 
-		child.expect(pexpect.EOF)
-		res = child.before.replace('\n', '<br />')
-		return res
+			#添加路由
+			subprocess.Popen(config.PPTPROUTERADD % self.vpnRoute, shell = True)
+
+		return ''.join(res).replace('\n', '<br />')
 
 	def vpnClose(self):
 		'''vpn关闭'''
 		if self.vpnType == 1:
-			child = pexpect.spawn(config.PPTPCLOSECMD % hashlib.new('md5', self.vpn).hexdigest()[8 : -8])
-			child.sendline('181633139')
+			#去掉路由
+			subprocess.Popen(config.PPTPROUTERDEL % self.vpnRoute, shell = True)
+			#关闭vpn
+			subprocess.Popen(config.PPTPCLOSECMD, shell = True)
 
-		child.expect(pexpect.EOF)
-		res = child.before.replace('\n', '<br />')
-		return res
+		return True
 
 	def scpSend(self, files):
 		'''scp发送文件'''
@@ -51,7 +58,7 @@ class SerLink:
 		
 		child.sendline(self.pw)
 		child.expect(pexpect.EOF)
-		return True
+		return ''
 
 	def sshRelese(self, verNos):
 		'''登录目标服务器运行发布脚本'''

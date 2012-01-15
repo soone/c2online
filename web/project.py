@@ -372,7 +372,7 @@ class Actioning:
 				isVpn = (v.isEmpty(serInfo['s_vpn']) == False) and (v.isEmpty(serInfo['s_vpnuser']) == False) and (v.isEmpty(serInfo['s_vpnpass']) == False)
 				if isVpn:
 					yield '<div>开始拨号连接...</div>'
-					vpnRs = sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro']})
+					vpnRs = sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro'], 'route' : serInfo['s_host']})
 					yield '<div>%s</div>' % str(vpnRs)
 					if vpnRs.find('succeeded') == -1:
 						yield '<div style="color:#f30">vpn拨号失败，请重试</div>'
