@@ -320,7 +320,7 @@ define(function(require, exports, module){
 							var dis = ls[i].r_status == 2 ? ' disabled = "disabled" ' : ' ';
 							listTr += '<tr><td><input type="checkbox" name="package"' + dis + 'id="rid_' + ls[i].r_id + '" value="' + ls[i].r_id + '"/></td>';
 							listTr += '<td><a href="javascript:;" id="p_detail_' + ls[i].r_id + '">' + ls[i].r_no + '</a></td>';
-							listTr += '<td>' + getLocalTime(ls[i].r_cdateline) + '</td><td id="status_' + ls[i].r_id + '">';
+							listTr += '<td>' + std.getLocalTime(ls[i].r_cdateline) + '</td><td id="status_' + ls[i].r_id + '">';
 							if(ls[i].r_status == 1)
 								listTr += '<span class="label important">待发布</span>';
 							else if(ls[i].r_status == 2)
@@ -329,7 +329,7 @@ define(function(require, exports, module){
 								listTr += '<span class="label notice">已发布</span>';
 							
 							listTr += '</td><td>' + ls[i].s_name + '</td>';
-							listTr += '<td>' + getLocalTime(ls[i].r_dateline) + '</td><td>';
+							listTr += '<td>' + std.getLocalTime(ls[i].r_dateline) + '</td><td>';
 							if(ls[i].r_status == 1) 
 								listTr += '<a href="javascript:;" class="btn" id="p_chastatus_2_' + ls[i].r_id + '">删除</a>';
 							else if(ls[i].r_status == 2)
@@ -338,7 +338,7 @@ define(function(require, exports, module){
 						}
 
 						$('#listtable > tbody').html(listTr);
-                        var pageRange = setPage((!page ? 1 : page), data['maxPage'], 2);
+                        var pageRange = std.setPage((!page ? 1 : page), data['maxPage'], 2);
                         var pl = '<li class="prev ' + (page == 1 ? 'disabled' : '') + '" id="pagepre"><a href="javascript:;" id="p_page_prev">&larr; Previous</a></li>';
 						if(pageRange[1] - data['maxPage'] >= 0 && data['maxPage'] > 5) pl += '<li><a href="javascript:;" id="p_page_1">1</li><li><a href="javascript:;">...</a></li>';
                         for(var i = pageRange[0]; i <= pageRange[1]; i++)
@@ -366,30 +366,6 @@ define(function(require, exports, module){
 			//取得服务器列表
 			getServerList(pId);
 		}
-
-		function getLocalTime(nS)
-		{
-			if(!parseInt(nS)) return '';
-			return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/时|分/g, ":").replace(/秒/g, "").replace(/日|星期.*\ /g, '');
-		}
-
-        //返回页码的开始和结束
-        function setPage(page, max, sep)
-        {
-            if(!sep) sep = 2;
-            var maxPage = sep*2+1;
-            var prev = page - sep;
-            var next = page + sep;
-            var min = max - maxPage + 1;
-            if((prev <= 0 && next >= max) || (prev > 0 && next >= max))
-                return min > 0 ? [min, max] : [1, max];
-
-            if(prev <= 0 && next < max)
-                return min > 0 ? [1, maxPage] : [1, max];
-
-            if(prev > 0 && next < max)
-                return min > 0 ? [prev, next] : [prev, max];
-        }
 
 		//取得服务器列表
 		function getServerList(pId)

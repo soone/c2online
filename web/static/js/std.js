@@ -64,4 +64,27 @@ define(function(require, exports, modules){
 	exports.getJson = function(type, url, data, callback){
 		$.ajax({type: type, url: url, data:data, dataType: 'json', success:callback});
 	};
+
+	exports.getLocalTime = function(nS){
+		if(!parseInt(nS)) return '';
+		return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/时|分/g, ":").replace(/秒/g, "").replace(/日|星期.*\ /g, '');
+	};
+
+	//返回页码的开始和结束
+	exports.setPage = function(page, max, sep)
+	{
+		if(!sep) sep = 2;
+		var maxPage = sep*2+1;
+		var prev = page - sep;
+		var next = page + sep;
+		var min = max - maxPage + 1;
+		if((prev <= 0 && next >= max) || (prev > 0 && next >= max))
+			return min > 0 ? [min, max] : [1, max];
+
+		if(prev <= 0 && next < max)
+			return min > 0 ? [1, maxPage] : [1, max];
+
+		if(prev > 0 && next < max)
+			return min > 0 ? [prev, next] : [prev, max];
+	}
 });

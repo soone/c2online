@@ -118,10 +118,34 @@ define(function(require, exports, module){
 		$('#sopen').live('click', function(){changeStatus(this, 1)});
 		$('#sclose').live('click', function(){changeStatus(this, 2)});
 
-		//显示项目已经打包的列表
-		$('a[id^="packlist_"]').live('click', function(){
-			var pInfo = $(this).attr('id').split('_');
-			showPackList(pInfo[2], pInfo[1]);
+		//发布历史记录查看
+		$('a[id^="history_"]').live('click', function(){
+			var id = $(this).attr('id');
+			var serId = id.split('_')[1];
+			if($('#hislist_' + serId).length)
+				return false;
+
+			$.getJSON('/servers/history/' + serId, function(data){
+				if(data['res'] == 1)
+				{
+					var ctx = '<tr><td colspan="6"><div class="alert-message info"><a class="close hislist" id="hislist_' + serId + '" href="javascript:void(0)">X</a><p><strong>历史记录</strong></p></div><table class="bordered-table zebra-striped"><thead><tr><th>#</th><th>版本号</th><th>发布时间</th></tr></thead><tbody>';
+					for(var i = 0, j = data['list'].length; i < j; i++)
+					{
+						ctx += '<tr><td>' + data['list'][i].h_id + '</td><td>' + data['list'][i].r_no + '</td><td>' + std.getLocalTime(data['list'][i].r_dateline) + '</td></tr>';
+					}
+
+					ctx += '</tbody><tfoot><tr><td colspan="3">test</td></tr></tfoot></table></td></tr>';
+
+					$('#' + id).parents('tr').after(ctx);
+				}
+				else
+					std.alertErrorBox('slist', data['msg']);
+			});
+		});
+
+		//历史记录隐藏
+		$('a[class~="hislist"]').live('click', function(){
+			$(this).parents('tr').remove();
 		});
 	};
 });

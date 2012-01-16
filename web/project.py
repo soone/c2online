@@ -362,7 +362,7 @@ class Actioning:
 						yield ('<div style="color:#f30">该版本不存在打包文件，将放弃重新打包</div>')
 						continue
 
-					vPack.goPack([{'f_path' : v.f_path, 'f_action' : v.f_action, 'f_ver' : v.f_ver} for v in pkList], p['r_no'])
+					vPack.goPack([{'f_path' : vers.f_path, 'f_action' : vers.f_action, 'f_ver' : vers.f_ver} for vers in pkList], p['r_no'])
 					yield ('<div style="color:#86cc12"><b>%s</b>重新打包完毕...</div>' % str(p['r_no']))
 				else:
 					yield ('<div style="color:#86cc12"><b>%s</b>版本发布包正常</div>' % str(p['r_no']))
