@@ -3,6 +3,7 @@ define(function(require, exports, module){
 	var std = require('std');
 	var main = std.cacheMain();//主框架缓存变量
     var createser = '<ul class="breadcrumb"><li><a href="/servers">服务器管理</a><span class="divider">/</span></li><li class="active">创建服务器</li></ul><form class="form-stacked" id="serform"><fieldset><div class="clearfix"><label for="pid">所属项目*</label><div class="input"><select name="pid" id="pid"><option value="">请选择</option></select></div></div><div class="clearfix"><label for="sname">名称*</label><div class="input"><input type="text" id="sname" class="xlarge" size="30" name="sname" /></div></div><div class="clearfix"><label for="pdir">生产地址*</label><div class="input"><input type="text" id="pdir" class="span8" size="256" name="pdir" /><span class="help-block">比如：/data/wwwV2/</span></div></div><div class="clearfix"><label for="pdir">备份地址*</label><div class="input"><input type="text" id="bdir" class="span8" size="256" name="bdir" /><span class="help-block">比如：/data/release/</span></div></div><div class="clearfix"><label for="spath">Host地址*</label><div class="input"><input type="text" id="spath" class="span8" size="256" name="spath" /><span class="help-block">比如：192.168.1.253</span></div></div><div class="clearfix"><label for="suser">用户名*</label><div class="input"><input type="text" id="suser" name="suser" /></div></div><div class="clearfix"><label for="spass">密码*</label><div class="input"><input type="password" id="spass" name="spass" /></div></div><div class="clearfix"><label for="vpnpro">vpn网关</label><div class="input"><select name="vpnpro" class="mini"><option value="1">PPTP</option></select>&nbsp;<input type="text" placeholder="192.168.1.253" id="svpn" class="span5" size="256" name="svpn" /></div></div><div class="clearfix"><label for="vpnname">vpn帐号</label><div class="input"><input type="text" id="vpnname" name="vpnname" /></div></div><div class="clearfix"><label for="vpnpass">vpn密码</label><div class="input"><input type="password" id="vpnpass" name="vpnpass" /></div></div></fieldset><div class="actions"><button class="btn primary" id="sersubmit">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
+	var history = '<tr><td colspan="6"><div class="alert-message info"><a class="close hislist" href="javascript:void(0)">X</a><p><strong>历史记录</strong></p></div><table class="bordered-table zebra-striped"><thead><tr><th>#</th><th>版本号</th><th>发布时间</th></tr></thead><tbody></tbody></table><div class="pagination" id="pagebar"><ul></ul></div><input type="hidden" />';
 
 	exports.init = function(){
 		//显示创建表单
@@ -125,27 +126,68 @@ define(function(require, exports, module){
 			if($('#hislist_' + serId).length)
 				return false;
 
-			$.getJSON('/servers/history/' + serId, function(data){
+			$(this).parents('tr').after(history);
+			$(this).parents('tr').next().find('a').attr('id', 'hislist_' + serId);
+			$(this).parents('tr').next().find('input').val(serId);
+
+			showHistoryList(serId);
+		});
+
+		function showHistoryList(serId, page)
+		{
+            page = !page ? 1 : page;
+			$.getJSON('/servers/history/' + serId + '/' + page, function(data){
 				if(data['res'] == 1)
 				{
-					var ctx = '<tr><td colspan="6"><div class="alert-message info"><a class="close hislist" id="hislist_' + serId + '" href="javascript:void(0)">X</a><p><strong>历史记录</strong></p></div><table class="bordered-table zebra-striped"><thead><tr><th>#</th><th>版本号</th><th>发布时间</th></tr></thead><tbody>';
+					var ctx = '';
 					for(var i = 0, j = data['list'].length; i < j; i++)
 					{
 						ctx += '<tr><td>' + data['list'][i].h_id + '</td><td>' + data['list'][i].r_no + '</td><td>' + std.getLocalTime(data['list'][i].r_dateline) + '</td></tr>';
 					}
 
-					ctx += '</tbody><tfoot><tr><td colspan="3">test</td></tr></tfoot></table></td></tr>';
+					var pageRange = std.setPage((!page ? 1 : page), data['maxPage'], 2);
+					var pl = '<li class="prev ' + (page == 1 ? 'disabled' : '') + '" id="pagepre"><a href="javascript:;" id="s_page_prev">&larr; Previous</a></li>';
+					if(pageRange[1] - data['maxPage'] >= 0 && data['maxPage'] > 5) pl += '<li><a href="javascript:;" id="s_page_1">1</li><li><a href="javascript:;">...</a></li>';
+					for(var i = pageRange[0]; i <= pageRange[1]; i++)
+					{
+						pl += '<li ' + (i == page ? 'class="active"' : '') + '><a href="javascript:;" id="s_page_' + i + '">' + i + '</a></li>';
+					}
 
-					$('#' + id).parents('tr').after(ctx);
+					if(data['maxPage'] > pageRange[1]) pl += '<li><a href="javascript:;">...</a></li><li><a href="javascript:;" id="s_page_' + data['maxPage'] + '">' + data['maxPage'] + '</li>';
+					pl += '<li class="next ' + (page == data['maxPage'] ? 'disabled' : '') + '"><a href="javascript:;" id="s_page_next">Next &rarr;</a></li>';
+					$('#pagebar > ul').html(pl);
+					$('#hislist_' + serId).parents('tr').find('tbody').html(ctx);
 				}
 				else
 					std.alertErrorBox('slist', data['msg']);
 			});
-		});
+		}
 
 		//历史记录隐藏
 		$('a[class~="hislist"]').live('click', function(){
 			$(this).parents('tr').remove();
+		});
+
+		//页码按钮事件
+		$('a[id^="s_page_"]').live('click', function(){
+			var id = $(this).attr('id').split('_')[2];
+			var serId = $(this).parents('div').next('input').val();
+			var curPage = parseInt($('a[id^="s_page_"]').parent('.active').text());
+			if(id ==curPage) return false;
+
+			if(id == 'prev' && curPage == 1) return false;
+			if(id == 'prev' && curPage > 1)
+				return showHistoryList(serId, curPage-1);
+
+			if(id == 'next') 
+			{
+				if($(this).parent('.disabled').get(0))
+					return false
+				else
+					return showHistoryList(serId, curPage+1);
+			}
+
+			showHistoryList(serId, parseInt($(this).text()));
 		});
 	};
 });

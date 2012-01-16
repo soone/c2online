@@ -51,11 +51,14 @@ class SerLink:
 		'''scp发送文件'''
 		fs = ' '.join(files)
 		scpCmd = 'scp -r %s %s@%s:%s' % (fs, self.user, self.host, self.bdir)
+		print scpCmd
 		child = pexpect.spawn(scpCmd)
-		i = child.expect([pexpect.TIMEOUT, 'password: '])
+		i = child.expect([pexpect.TIMEOUT, 'Are you sure you want to continue connecting', 'password: '])
 		if i == 0:
 			return 'ERROR!'
-		
+		elif i == 1:
+			child.sendline('yes')
+
 		child.sendline(self.pw)
 		child.expect(pexpect.EOF)
 		return ''

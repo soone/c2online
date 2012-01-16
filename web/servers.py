@@ -7,6 +7,7 @@ import time
 from modules import dbHelp
 from modules import valids
 import sys
+import math
 
 urls = (
 		'', 'ReServers',
@@ -15,7 +16,7 @@ urls = (
 		'/change/', 'Change',
 		'/update/', 'Update',
 		'/shortlist/(\d*)', 'ShortList',
-		'/history/(\d*)', 'History',
+		'/history/(\d*)/(\d*)', 'History',
 )
 
 render = config.render
@@ -178,20 +179,38 @@ class ShortList:
 			return json.dumps({'res' : 0, 'msg' : '服务器列表读取失败'})
 
 class History:
-	def GET(self, sId):
+	def GET(self, sId, page = None):
 		'''取数据库发布列表信息'''
 		v = valids.Valids()
 		sId = sId.strip()
 		if v.isEmpty(sId):
 			return json.dumps({'res' : 0, 'msg' : '参数不合法'})
 
+		if page == '':
+			page = 1
+
+		page = int(page)
+
+		eachPage = 10
+
 		try:
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
-			slist = db.select('c2_log', what = '*', where = 's_id = $sId', order='r_dateline desc', vars = locals())
+			#查看发布总数
+			ct = db.select('c2_log', what = 'COUNT(*) AS c', where = 's_id = $sId', vars = locals())
+			allNums = ct[0].c
+			if allNums <= 0: 
+				return json.dumps({'res' : 0, 'msg' : '暂无发布历史'})
+
+			#最大页数
+			maxPage = int(math.ceil(float(allNums)/eachPage))
+			if page > maxPage:
+				page = maxPage
+
+			slist = db.select('c2_log', what = '*', where = 's_id = $sId', limit = '%d, %d' % ((page-1)*eachPage, eachPage),  order='r_dateline desc', vars = locals())
 			if len(slist) == 0:
 				return json.dumps({'res' : 0, 'msg' : '暂无发布历史'})
 
-			return json.dumps({'res' : 1, 'list' : [l for l in slist]})
+			return json.dumps({'res' : 1, 'list' : [l for l in slist], 'maxPage' : maxPage})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '发布历史列表读取失败'})
