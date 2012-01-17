@@ -3,7 +3,6 @@ from modules import vcs
 from conf import config
 import hashlib
 import os
-import pysvn
 
 class VcsPack:
 	'''专门打包从版本库抽象出来的文件'''

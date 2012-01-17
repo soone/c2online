@@ -3,7 +3,7 @@ define(function(require, exports, module){
 	var std = require('std');
 	var main = std.cacheMain();//主框架缓存变量
     var createser = '<ul class="breadcrumb"><li><a href="/servers">服务器管理</a><span class="divider">/</span></li><li class="active">创建服务器</li></ul><form class="form-stacked" id="serform"><fieldset><div class="clearfix"><label for="pid">所属项目*</label><div class="input"><select name="pid" id="pid"><option value="">请选择</option></select></div></div><div class="clearfix"><label for="sname">名称*</label><div class="input"><input type="text" id="sname" class="xlarge" size="30" name="sname" /></div></div><div class="clearfix"><label for="pdir">生产地址*</label><div class="input"><input type="text" id="pdir" class="span8" size="256" name="pdir" /><span class="help-block">比如：/data/wwwV2/</span></div></div><div class="clearfix"><label for="pdir">备份地址*</label><div class="input"><input type="text" id="bdir" class="span8" size="256" name="bdir" /><span class="help-block">比如：/data/release/</span></div></div><div class="clearfix"><label for="spath">Host地址*</label><div class="input"><input type="text" id="spath" class="span8" size="256" name="spath" /><span class="help-block">比如：192.168.1.253</span></div></div><div class="clearfix"><label for="suser">用户名*</label><div class="input"><input type="text" id="suser" name="suser" /></div></div><div class="clearfix"><label for="spass">密码*</label><div class="input"><input type="password" id="spass" name="spass" /></div></div><div class="clearfix"><label for="vpnpro">vpn网关</label><div class="input"><select name="vpnpro" class="mini"><option value="1">PPTP</option></select>&nbsp;<input type="text" placeholder="192.168.1.253" id="svpn" class="span5" size="256" name="svpn" /></div></div><div class="clearfix"><label for="vpnname">vpn帐号</label><div class="input"><input type="text" id="vpnname" name="vpnname" /></div></div><div class="clearfix"><label for="vpnpass">vpn密码</label><div class="input"><input type="password" id="vpnpass" name="vpnpass" /></div></div></fieldset><div class="actions"><button class="btn primary" id="sersubmit">提交</button>&nbsp;<button class="btn" id="cancel">取消</button></div></form>';
-	var history = '<tr><td colspan="6"><div class="alert-message info"><a class="close hislist" href="javascript:void(0)">X</a><p><strong>历史记录</strong></p></div><table class="bordered-table zebra-striped"><thead><tr><th>#</th><th>版本号</th><th>发布时间</th></tr></thead><tbody></tbody></table><div class="pagination" id="pagebar"><ul></ul></div><input type="hidden" />';
+	var history = '<tr><td colspan="6"><div class="alert-message info"><a class="close hislist" href="javascript:void(0)">X</a><p><strong>历史记录</strong></p></div><table class="bordered-table zebra-striped"><thead><tr><th>#</th><th>版本号</th><th>发布时间</th></tr></thead><tbody></tbody></table><div class="pagination"><ul></ul></div><input type="hidden" />';
 
 	exports.init = function(){
 		//显示创建表单
@@ -129,6 +129,7 @@ define(function(require, exports, module){
 			$(this).parents('tr').after(history);
 			$(this).parents('tr').next().find('a').attr('id', 'hislist_' + serId);
 			$(this).parents('tr').next().find('input').val(serId);
+			$(this).parents('tr').next().find('.pagination').attr('id', 'pagebar_' + serId);
 
 			showHistoryList(serId);
 		});
@@ -155,7 +156,7 @@ define(function(require, exports, module){
 
 					if(data['maxPage'] > pageRange[1]) pl += '<li><a href="javascript:;">...</a></li><li><a href="javascript:;" id="s_page_' + data['maxPage'] + '">' + data['maxPage'] + '</li>';
 					pl += '<li class="next ' + (page == data['maxPage'] ? 'disabled' : '') + '"><a href="javascript:;" id="s_page_next">Next &rarr;</a></li>';
-					$('#pagebar > ul').html(pl);
+					$('#hislist_' + serId).parents('tr').find('ul').html(pl);
 					$('#hislist_' + serId).parents('tr').find('tbody').html(ctx);
 				}
 				else

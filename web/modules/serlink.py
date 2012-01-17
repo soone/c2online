@@ -33,6 +33,7 @@ class SerLink:
 					res.append(rs)
 
 			#添加路由
+			print config.PPTPROUTERADD % self.vpnRoute
 			subprocess.Popen(config.PPTPROUTERADD % self.vpnRoute, shell = True)
 
 		return ''.join(res).replace('\n', '<br />')
@@ -51,7 +52,6 @@ class SerLink:
 		'''scp发送文件'''
 		fs = ' '.join(files)
 		scpCmd = 'scp -r %s %s@%s:%s' % (fs, self.user, self.host, self.bdir)
-		print scpCmd
 		child = pexpect.spawn(scpCmd)
 		i = child.expect([pexpect.TIMEOUT, 'Are you sure you want to continue connecting', 'password: '])
 		if i == 0:
