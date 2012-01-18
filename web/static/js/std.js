@@ -2,16 +2,6 @@ define(function(require, exports, modules){
 	var $ = require('jquery');
 	var disDiv = '<div id="disDiv"></div>';
 	var activeObj = {};
-	//exports.active = function(obj){
-	//	activeObj = $(obj).clone();
-	//	$(obj).html('处理中...').removeClass().addClass('btn disabled');
-	//	$(obj).off();
-	//};
-
-	//exports.resetActive = function(obj){
-	//	$(obj).removeClass().html(activeObj.html()).addClass(activeObj.attr('class'));
-	//	$(obj).attr('disabled', false);
-	//};
 	exports.active = function(objId){
 		activeObj[objId] = $('#' + objId).clone();
 		$('#' + objId).replaceWith('<a href="javascript:;" class="btn disabled" id="_actioning_' + objId + '">处理中...</a>');
@@ -86,5 +76,25 @@ define(function(require, exports, modules){
 
 		if(prev > 0 && next < max)
 			return min > 0 ? [prev, next] : [prev, max];
-	}
+	};
+
+	//返回url的QueryString
+	exports.queryString = function()
+	{
+		var str = location.href;
+		var start = str.indexOf('?');
+		var qStr = str.substr(start + 1);
+		var qStrArr = qStr.split('&');
+		var resArr = {};
+		for(i = 0, j = qStrArr.length; i < j; i++)
+		{
+			var tempArr = qStrArr[i].split("=");
+			if(i == 0 && tempArr.length == 1)
+				return qStr;
+
+			resArr[tempArr[0]] = tempArr[1];
+		}
+
+		return resArr;
+	};
 });

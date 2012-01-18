@@ -27,7 +27,6 @@ define(function(require, exports, module){
 		//提交创建表单
 		$('#serform').live('submit', function(){
 			std.active('sersubmit');
-			$('#sersubmit').attr('disabled', true);
 			var postData ={};
 			postData.sname = $('#sname').val();
 			postData.pdir = $('#pdir').val();

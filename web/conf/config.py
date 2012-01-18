@@ -13,7 +13,7 @@ web.config.session_parameters['ignore_change_ip'] = True #如果为True，则表
 web.config.session_parameters['secret_key'] = 'fLjUf2*feRiU3#' #密码种子，为session加密提供一个字符串种子
 web.config.session_parameters['expired_message'] = '对不起，会话过期，请重新登录' #session过期时显示的提示信息
 
-SESSIONSTORE = '/tmp/'
+SESSIONSTORE = '/tmp/sessions'
 
 web.config.debug = False #关闭调试模式
 
