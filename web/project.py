@@ -27,8 +27,20 @@ urls = (
 		'/packstatus/(\d+)/(\d+)', 'PackStatus',
 		'/actioning/(\d+)/(.+)', 'Actioning',
         )
+
+def onload(handler):
+	#判断登录
+	print globals()
+#	try:
+#		print web.ctx.session.uId
+#	except:
+#		web.seeother('../index?login')
+
+	return handler()
+
 render = config.render
 appProject = web.application(urls, globals())
+appProject.add_processor(onload)
 
 class ReProject:
 	def GET(self): raise web.redirect('/')

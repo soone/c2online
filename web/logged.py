@@ -2,9 +2,14 @@
 #-*-coding:utf-8-*-
 import web
 from conf import config
+from modules import dbHelp
+from modules import valids
+import json
+import time
+import hashlib
 
 urls = (
-        '/login',  'Login',
+        '/login/',  'Login',
 		'(.*)', 'ReIndex',
 )
 
@@ -21,48 +26,33 @@ class Login:
 		pwd = inputs['pass'].strip()
 		v = valids.Valids()
 
-		if v.isEmpty(user) or v.isEmpty(pwd):
-			return json.dumps({'res' : 0, 'msg' : '请填写正确的用户名和密码'})
+		if v.isEmpty(user) or v.isEmpty(pwd) or len(user) > 12 or len(user) < 5 or len(pwd) > 24 or len(pwd) < 6:
+			return json.dumps({'res' : 0, 'msg' : 'Oops...请填写正确的用户名和密码'})
 
 		#入库操作
-		try:
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			#查看pid是否真实存在
-			res = db.select('c2_project', what = 'p_name', where = 'p_id = $pId', limit = 1, vars = locals())
-			if len(res) < 1:
-				return json.dumps({'res' : 0, 'msg' : '对应项目不存在'})
+		#try:
+		dbase = dbHelp.DbHelp()
+		db = dbase.database()
+		#查看用户是否真实存在
+		res = db.select('c2_admin', what = '*', where = 'adm_user = $user', limit = 1, vars = locals())
+		if len(res) < 1:
+			return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
 
-			pname = res[0].p_name
-			#查看是否重名
-			rs = db.select('c2_server', what = 's_id', where = 's_name = $sname', limit = 1, vars = locals())
-			if len(rs) > 0:
-				return json.dumps({'res' : 0, 'msg' : '该服务器名称已经存在'})
+		uInfo = res[0]
 
-			pData = {'p_id' : pId, 
-					's_name' : sname, 
-					's_host' : spath, 
-					's_user' : suser, 
-					's_pass' : spass, 
-					's_pdir' : pdir, 
-					's_bdir' : bdir, 
-					's_cdateline' : time.time(), 
-					's_status' : 1,
-					'p_name' : pname}
-			if 'svpn' in inputs:
-				pData['s_vpn'] = inputs['svpn'].strip()
+		if uInfo.adm_status == 2:
+			return json.dumps({'res' : 0, 'msg' : 'Oops...该用户已经被禁用'})
 
-			if 'svpnname' in inputs:
-				pData['s_vpnuser'] = inputs['svpnname'].strip()
+		if uInfo.adm_pass != hashlib.new('md5', '%s%s' % (user, pwd)).hexdigest():
+			return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
 
-			if 'svpnpass' in inputs:
-				pData['s_vpnpass'] = inputs['svpnpass'].strip()
-
-			res = db.insert('c2_server', **pData)
-
-			return json.dumps({'res' : 1})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+		#设置session
+		web.ctx.session.uId = uInfo.adm_id
+		web.ctx.session.uName = uInfo.adm_user
+		web.ctx.session.uAuth = uInfo.adm_auth
+		return json.dumps({'res' : 1, 'uInfo' : [uInfo.adm_id, uInfo.adm_user, uInfo.adm_auth]})
+		#except:
+			#return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
 class Change:
 	def POST(self):

@@ -15,7 +15,7 @@ web.config.session_parameters['expired_message'] = '对不起，会话过期，�
 
 SESSIONSTORE = '/tmp/sessions'
 
-web.config.debug = False #关闭调试模式
+web.config.debug = True #关闭调试模式
 
 render = render_mako(
 	directories = ['templates'],

@@ -13,7 +13,7 @@ define(function(require, exports, module){
 		{
 			if($('#loginwarning').length == 0)
 			{
-				std.alertErrorBox('main', 'oops...请先登录，谢谢!!');
+				std.alertErrorBox('main', 'Oops...请先登录，谢谢!!');
 				$('#loginwarning').fadeOut(600).fadeIn(600);
 			}
 			$('#loginuserinput').focus();
@@ -26,7 +26,7 @@ define(function(require, exports, module){
 			postData.pass = $('input[name="password"]').val();
 			if(std.validAllNotEmpty(postData) == false)
 			{
-				std.alertErrorBox('main', '请填写正确的用户名和密码');
+				std.alertErrorBox('main', 'Oops...请填写正确的用户名和密码');
 				std.resetActive('loginsubmit');
 				return false;
 			}
@@ -40,7 +40,7 @@ define(function(require, exports, module){
 				}
 				else
 				{
-					location.href = "/servers/";
+					//location.href = "/servers/";
 					return false;
 				}
 			})

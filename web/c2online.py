@@ -16,24 +16,18 @@ urls = (
 )
 
 def onload(handler):
-	if re.match('^(/servers|/project)+(.*)', web.ctx.path) != None:
-		#判断登录
-		try:
-			getattr('session', 'userId')
-		except:
-			web.redirect('/index?login')
-
+	web.ctx.session = session
 	return handler()
 
 render = config.render
 c2online = web.application(urls, globals())
 c2online.add_processor(onload)
-session = web.session.Session(c2online, web.session.DiskStore(config.SESSIONSTORE), initializer = {'userId' : ''})
-#if web.config.get('_session') is None:
-#	session = web.session.Session(c2online, web.session.DiskStore(config.SESSIONSTORE), initializer = {'userId' : ''})
-#	web.config._session = session
-#else:
-#	session = web.config._session
+#session = web.session.Session(c2online, web.session.DiskStore(config.SESSIONSTORE))
+if web.config.get('_session') is None:
+	session = web.session.Session(c2online, web.session.DiskStore(config.SESSIONSTORE), initializer = {'userId' : ''})
+	web.config._session = session
+else:
+	session = web.config._session
 
 class Index(object):
 	def GET(self, path):
