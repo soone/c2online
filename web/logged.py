@@ -10,6 +10,7 @@ import hashlib
 
 urls = (
         '/login/',  'Login',
+		'/logout/', 'Logout',
 		'(.*)', 'ReIndex',
 )
 
@@ -17,7 +18,7 @@ render = config.render
 appLogged = web.application(urls, globals())
 
 class ReIndex:
-	def GET(self): raise web.redirect('/index')
+	def GET(self): raise web.redirect('/', True)
 
 class Login:
 	def POST(self):
@@ -30,29 +31,29 @@ class Login:
 			return json.dumps({'res' : 0, 'msg' : 'Oops...请填写正确的用户名和密码'})
 
 		#入库操作
-		#try:
-		dbase = dbHelp.DbHelp()
-		db = dbase.database()
-		#查看用户是否真实存在
-		res = db.select('c2_admin', what = '*', where = 'adm_user = $user', limit = 1, vars = locals())
-		if len(res) < 1:
-			return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#查看用户是否真实存在
+			res = db.select('c2_admin', what = '*', where = 'adm_user = $user', limit = 1, vars = locals())
+			if len(res) < 1:
+				return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
 
-		uInfo = res[0]
+			uInfo = res[0]
 
-		if uInfo.adm_status == 2:
-			return json.dumps({'res' : 0, 'msg' : 'Oops...该用户已经被禁用'})
+			if uInfo.adm_status == 2:
+				return json.dumps({'res' : 0, 'msg' : 'Oops...该用户已经被禁用'})
 
-		if uInfo.adm_pass != hashlib.new('md5', '%s%s' % (user, pwd)).hexdigest():
-			return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
+			if uInfo.adm_pass != hashlib.new('md5', '%s%s' % (user, pwd)).hexdigest():
+				return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
 
-		#设置session
-		web.ctx.session.uId = uInfo.adm_id
-		web.ctx.session.uName = uInfo.adm_user
-		web.ctx.session.uAuth = uInfo.adm_auth
-		return json.dumps({'res' : 1, 'uInfo' : [uInfo.adm_id, uInfo.adm_user, uInfo.adm_auth]})
-		#except:
-			#return json.dumps({'res' : 0, 'msg' : '系统错误'})
+			#设置session
+			web.ctx.session.uId = uInfo.adm_id
+			web.ctx.session.uName = uInfo.adm_user
+			web.ctx.session.uAuth = uInfo.adm_auth
+			return json.dumps({'res' : 1, 'uInfo' : [uInfo.adm_id, uInfo.adm_user, uInfo.adm_auth]})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
 class Change:
 	def POST(self):
@@ -170,3 +171,9 @@ class History:
 			return json.dumps({'res' : 1, 'list' : [l for l in slist], 'maxPage' : maxPage})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '发布历史列表读取失败'})
+
+class Logout:
+	def GET(self):
+		'''直接删除session'''
+		web.ctx.session.kill()
+		return json.dumps({'res' : 1, 'redirect' : '/'})

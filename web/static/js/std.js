@@ -2,6 +2,7 @@ define(function(require, exports, modules){
 	var $ = require('jquery');
 	var disDiv = '<div id="disDiv"></div>';
 	var activeObj = {};
+	var logInfo = {};
 	exports.active = function(objId){
 		activeObj[objId] = $('#' + objId).clone();
 		$('#' + objId).replaceWith('<a href="javascript:;" class="btn disabled" id="_actioning_' + objId + '">处理中...</a>');
@@ -96,5 +97,23 @@ define(function(require, exports, modules){
 		}
 
 		return resArr;
+	};
+
+	//处理登录表单显示
+	exports.loginDisplay = function(uInfo){
+		var logForms = '<form class="pull-right" id="loginforms"><input class="input-small" type="text" placeholder="Username" name="username" id="loginuserinput"><input class="input-small" type="password" placeholder="Password" name="password"><button class="btn" type="button" id="loginsubmit">登陆</button></form>';
+		var login = '<div class="logined pull-right" id="logininfos">你好！<a href="javascript:;" id="loginname"></a>&nbsp;&nbsp;<a href="javascript:;" id="authset">设置</a>&nbsp;&nbsp;<a href="javascript:;">退出</a></div>';
+		if(!uInfo.length && !$('#loginforms').length)
+			$('#topnav').append(logForms);
+
+		if(uInfo.length)
+		{
+			logInfo.name = uInfo[1];
+			logInfo.id = uInfo[0];
+			logInfo.auth = uInfo[2];
+			$('#loginforms').fadeOut();
+			$('#topnav').append(login);
+			$('#loginname').text(logInfo.name);
+		}
 	};
 });

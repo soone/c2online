@@ -28,13 +28,16 @@ urls = (
 		'/actioning/(\d+)/(.+)', 'Actioning',
         )
 
+logUserInfo = {}
 def onload(handler):
-	#判断登录
-	print globals()
-#	try:
-#		print web.ctx.session.uId
-#	except:
-#		web.seeother('../index?login')
+	try:
+		global logUserInfo
+		logUserInfo = {'uName' : web.ctx.session.uName, 'uAuth' : web.ctx.session.uAuth, 'uId' : web.ctx.session.uId}
+	except:
+		if 'HTTP_X_REQUESTED_WITH' in web.ctx:
+			return json.dumps({'res' : 0, 'msg' : '各项不能为空'})
+		else:
+			web.seeother('/index?login', True)
 
 	return handler()
 
@@ -54,9 +57,9 @@ class Project:
 			plist = db.select('c2_project', order='p_status asc, p_cdateline desc')
 			if len(plist) == 0:
 				plist = ''
-			return render.project(plist = plist, ac = 2)
+			return render.project(plist = plist, ac = 2, logUserInfo = logUserInfo)
 		except:
-			return render.project(ac = 2)
+			return render.project(ac = 2, logUserInfo = logUserInfo)
 
 
 class Create:

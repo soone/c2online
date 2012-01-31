@@ -40,11 +40,31 @@ define(function(require, exports, module){
 				}
 				else
 				{
-					//location.href = "/servers/";
+					std.loginDisplay(data['uInfo']);
 					return false;
 				}
-			})
-		})
+			});
+		});
+
+		$('#logout').live('click', function(){
+			std.active('logout');
+			std.getJson('get', '/logged/logout/', function(data){
+				alert(data);
+				if(data['res'] == 0)
+				{
+					std.alertErrorBox('main', data['msg']);
+					std.resetActive('logout');
+					return false;
+				}
+				else
+				{
+					alert('hello');
+					location.href = data['redirect'];
+					return false;
+				}
+
+			});
+		});
 	});
 
 });

@@ -8,7 +8,7 @@
 	<body>
         <header class="topbar">
             <div class="fill">
-              <div class="container">
+              <div class="container" id="topnav">
                 <a class="brand" href="#">N8_C2online</a>
                 <nav>
 					<ul class="nav">
@@ -17,13 +17,15 @@
 							${navactive(3)}<a href="/servers">服务器管理</a></li>
 					</ul>
                 </nav>
-                <form class="pull-right">
+				%if logUserInfo :
+				<div class="logined pull-right" id="logininfos">你好！<a href="javascript:;">${logUserInfo['uName']}</a>&nbsp;&nbsp;<a href="javascript:;" id="logset">设置</a>&nbsp;&nbsp;<a href="javascript:;" id="logout">退出</a></div>
+				%else:
+                <form class="pull-right" id="loginforms">
                     <input class="input-small" type="text" placeholder="Username" name="username" id="loginuserinput">
                     <input class="input-small" type="password" placeholder="Password" name="password">
                     <button class="btn" type="button" id="loginsubmit">登陆</button>
                 </form>
-				<!--<div class="logined pull-right">你好！<a href="javascript:;">fdsfdsafsdasoone</a>&nbsp;&nbsp;<a href="javascript:;">设置</a></div>-->
-				</div>
+				%endif
               </div>
             </div>
         </header>
