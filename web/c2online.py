@@ -6,15 +6,18 @@ from conf import config
 import project
 import servers
 import logged
-import re
 import json
 from modules import dbHelp
+from modules import valids
+import hashlib
 
 urls = (
 	'/servers', servers.appServers,
     '/project', project.appProject,
 	'/logged', logged.appLogged,
 	'/users', 'UserList',
+	'/users/set', 'UserSetStatus',
+	'/users/pwd', 'UserSetPwd',
 	'/(.*)',  'Index',
 )
 
@@ -54,6 +57,57 @@ class UserList:
 			return json.dumps({'res' : 1, 'users' : [l for l in ulist], 'curId' : uId, 'curAuth' : uAuth})
 		except:
 			return json.dumps({'res' : 0, 'msg' : 'Oops...请重新刷新页面'})
+
+class UserSetStatus:
+	def POST(self):
+		inputs = web.input()
+		uId = inputs['uId'].strip()
+		status = int(inputs['sta'].strip())
+		v = valids.Valids()
+
+		if v.isEmpty(uId):
+			return json.dumps({'res' : 0, 'msg' : '参数错误'})
+
+		#操作数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			db.update('c2_admin', adm_status = status, where = 'adm_id = $uId', vars=locals())
+			return json.dumps({'res' : 1})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+
+class UserSetPwd:
+	def POST(self):
+		inputs = web.input()
+		uId = inputs['uId'].strip()
+		pwd = inputs['pwd'].strip()
+		v = valids.Valids()
+		pwdLen = len(pwd)
+
+		if v.isEmpty(uId) or pwdLen < 6 or pwdLen > 12:
+			return json.dumps({'res' : 0, 'msg' : '密码长度必须在6－12个字符之间'})
+
+		if web.ctx.session.uAuth != 1 and web.ctx.session.uId != int(uId):
+			return json.dumps({'res' : 0, 'msg' : '对不起，你没有权限修改该用户密码'})
+
+
+		#操作数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			md5Pwd = hashlib.new('md5', '%s%s' % (web.ctx.session.uName, pwd)).hexdigest()
+			if web.ctx.session.uId != uId:
+				uInfo = db.select('c2_admin', what = 'adm_user', where = 'adm_id= $uId', limit = 1, vars = locals())
+				if len(uInfo) < 1:
+					return json.dumps({'res' : 0, 'msg' : '对不起，该用户不存在'})
+
+				md5Pwd = hashlib.new('md5', '%s%s' % (uInfo[0].adm_user, pwd)).hexdigest()
+
+			db.update('c2_admin', adm_pass = md5Pwd, where = 'adm_id = $uId', vars=locals())
+			return json.dumps({'res' : 1})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
 if __name__ == "__main__":
 	c2online.run()

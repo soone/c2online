@@ -5,7 +5,6 @@ from conf import config
 from modules import dbHelp
 from modules import valids
 import json
-import time
 import hashlib
 
 urls = (
@@ -42,7 +41,7 @@ class Login:
 
 			uInfo = res[0]
 
-			if uInfo.adm_status == 2:
+			if uInfo.adm_status != 1:
 				return json.dumps({'res' : 0, 'msg' : 'Oops...该用户已经被禁用'})
 
 			if uInfo.adm_pass != hashlib.new('md5', '%s%s' % (user, pwd)).hexdigest():

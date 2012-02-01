@@ -82,7 +82,7 @@ class Create:
 		try:
 			dbase = dbHelp.DbHelp()
 			db = dbase.database()
-			res = db.insert('c2_project', p_name = name, \
+			db.insert('c2_project', p_name = name, \
 			p_vcspath = vcspath, \
 			p_user = vcsuser, \
 			p_pass = vcspass, \
@@ -168,7 +168,7 @@ class VcsList:
 			db = dbase.database()
 			res = db.select('c2_project', what = 'p_vcspath, p_user, p_pass', where = 'p_id = $pro AND p_status = 1', vars = locals())
 			if len(res) == 0:
-				raise Error
+				return json.dumps({'res' : 0, 'msg' : '暂无项目信息'})
 
 			rs = res[0]
 			pv = vcs.Vcs(vPath = rs.p_vcspath, vUser = rs.p_user, vPass = rs.p_pass)

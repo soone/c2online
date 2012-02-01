@@ -4,7 +4,7 @@ import os
 import sys
 FILELOG = 'files.log'
 PRESHELL = 'pre.sh'
-class Rollback:
+class RollBack:
 	def __init__(self):
 		self.verNo = sys.argv[1]
 		self.relDir = sys.argv[2]

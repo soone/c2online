@@ -84,10 +84,10 @@ define(function(require, exports, module){
 						ts += '</td>';
 						ts += '<td>' + std.getLocalTime(users[i].adm_dateline) + '</td><td>';
 						ts += '';
-						ts += (data['curId'] == users[i].adm_id || (data['curId'] == users[i].adm_id && users[i].adm_auth == 1)) ? '&nbsp;<a href="javascript:;" id="setpass_' + users[i].adm_id + '" class="btn">修改密码</a>' : '';
-						if(data['curId'] == users[i].adm_id && users[i].adm_auth == 1)
+						ts += (data['curId'] == users[i].adm_id || data['curAuth'] == 1) ? '&nbsp;<a href="javascript:;" id="setpass_' + users[i].adm_id + '" class="btn">修改密码</a>' : '';
+						if(data['curId'] != users[i].adm_id && data['curAuth'] == 1)
 						{
-							ts += users[i].adm_status == 1 ? '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_0" class="btn">设为关闭</a>' : '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_1" class="btn">设为打开</a>';
+							ts += users[i].adm_status == 1 ? '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_0" class="btn">设为关闭</a>' : '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_1" class="btn">设为正常</a>';
 						}
 
 						ts += '</td></tr>';
@@ -101,15 +101,92 @@ define(function(require, exports, module){
 			});
 
 			$('a[id^="setpass_"]').live('click', function(){
-				var id = $(this).attr('id').split('_')[1];
+				var idName = $(this).attr('id');
+				var id = idName.split('_')[1];
+				if(!$(this).parents('tr').next().find('form').length)
+				{
+					$(this).parents('tr').after('<tr><td colspan="5"><form><fieldset><div class="clearfix"><label for="userpwd_' + id + '">新密码：</label><div class="input"><input type="password" name="userpwd" size="30" id="userpwd_' + id + '"></div></div><div class="clearfix"><label for="repeatpwd_' + id + '">确认密码：</label><div class="input"><input type="password" name="repeatpwd" size="30" id="repeatpwd_' + id + '"></div></div></fieldset><div class="actions"><a class="btn primary" id="pwdsub_' + id + '">提交</a>&nbsp;<a id="pwdcancel_' + id + '" class="btn">取消</a></div></form></td></tr>');
+				}
+				else
+					$(this).parents('tr').next('tr').fadeIn('slow');
+			});
+
+			$('a[id^="pwdsub_"]').live('click', function(){
+				var idName = $(this).attr('id');
+				std.active(idName);
+				var id = idName.split('_')[1];
+				var pwd = $('#userpwd_' + id).val();
+				var repeatPwd = $('#repeatpwd_' + id).val();
+				var pwdLen = pwd.length;
+				if(pwd != repeatPwd || !pwd || pwdLen < 6 || pwdLen > 12)
+				{
+					std.alertErrorBox('main', '密码长度必须在6－12个字符之间，且两次密码必须一致，请确认');
+					std.resetActive(idName);
+					return false;
+				}
+
+				std.getJson('POST', '/users/pwd', {pwd : pwd, uId : id}, function(data){
+					if(data['res'] == 0)
+					{
+						std.alertErrorBox('main', data['msg']);
+						std.resetActive(idName);
+						return false;
+					}
+					else
+					{
+						alert(idName);
+						$('#' + idName).parents('tr').fadeOut('slow');
+					}
+				});
+			});
+
+			$('a[id^="pwdcancel_"]').live('click', function(){
+				$(this).parents('tr').fadeOut('slow');
 			});
 
 			$('a[id^="admstatus_"]').live('click', function(){
-				var tArr = $(this).attr('id').split('_');
-				var id = tArr[1];
-				var sta = tArr[2];
+				var idName = $(this).attr('id');
+				var tArr = idName.split('_');
+				var id = parseInt(tArr[1]);
+				var sta = parseInt(tArr[2]);
+				if(!id)
+				{
+					std.alertErrorBox('main', '参数错误');
+					return false;
+				}
+
+				std.getJson('post', '/users/set', {uId : id, sta : sta}, function(data){
+					if(data['res'] == 0)
+					{
+						std.alertErrorBox('main', data['msg']);
+						return false;
+					}
+					else
+					{
+						var setTxt = '设为正常';
+						var rClass = 'success';
+						var aClass = 'warning';
+						var spanTxt = '关闭';
+						var nowSta = 1;
+						if(sta == 1)
+						{
+							setTxt = '设为关闭';
+							spanTxt = '正常';
+							tmpClass = rClass;
+							rClass = aClass;
+							aClass = tmpClass;
+							nowSta = 0;
+						}
+
+						$('#' + idName).text(setTxt);
+						var spanObj = $('#' + idName).parents('tr').find('span');
+						spanObj.text(spanTxt);
+						spanObj.removeClass(rClass).addClass(aClass);
+						$('#' + idName).attr('id', tArr[0] + '_' + tArr[1] + '_' + nowSta);
+						return false;
+					}
+				});
 			});
 		});
 	});
-
 });

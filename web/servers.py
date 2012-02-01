@@ -6,7 +6,6 @@ import json
 import time
 from modules import dbHelp
 from modules import valids
-import sys
 import math
 
 urls = (
