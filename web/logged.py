@@ -11,6 +11,7 @@ import hashlib
 urls = (
         '/login/',  'Login',
 		'/logout/', 'Logout',
+		'/users/', 'UserList',
 		'(.*)', 'ReIndex',
 )
 
@@ -116,64 +117,11 @@ class Update:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class ShortList:
-	def GET(self, pId):
-		'''取数据库服务器列表信息'''
-		v = valids.Valids()
-		pId = pId.strip()
-		if v.isEmpty(pId):
-			return json.dumps({'res' : 0, 'msg' : '参数不合法'})
-
-		try:
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			plist = db.select('c2_server', what = 's_id, s_name', where = 's_status = 1 AND p_id = $pId', order='s_cdateline desc', vars = locals())
-			if len(plist) == 0:
-				return json.dumps({'res' : 0, 'msg' : '暂无服务器列表，请先创建服务器'})
-
-			return json.dumps({'res' : 1, 'list' : [l for l in plist]})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '服务器列表读取失败'})
-
-class History:
-	def GET(self, sId, page = None):
-		'''取数据库发布列表信息'''
-		v = valids.Valids()
-		sId = sId.strip()
-		if v.isEmpty(sId):
-			return json.dumps({'res' : 0, 'msg' : '参数不合法'})
-
-		if page == '':
-			page = 1
-
-		page = int(page)
-
-		eachPage = 10
-
-		try:
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			#查看发布总数
-			ct = db.select('c2_log', what = 'COUNT(*) AS c', where = 's_id = $sId', vars = locals())
-			allNums = ct[0].c
-			if allNums <= 0: 
-				return json.dumps({'res' : 0, 'msg' : '暂无发布历史'})
-
-			#最大页数
-			maxPage = int(math.ceil(float(allNums)/eachPage))
-			if page > maxPage:
-				page = maxPage
-
-			slist = db.select('c2_log', what = '*', where = 's_id = $sId', limit = '%d, %d' % ((page-1)*eachPage, eachPage),  order='r_dateline desc', vars = locals())
-			if len(slist) == 0:
-				return json.dumps({'res' : 0, 'msg' : '暂无发布历史'})
-
-			return json.dumps({'res' : 1, 'list' : [l for l in slist], 'maxPage' : maxPage})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '发布历史列表读取失败'})
-
 class Logout:
 	def GET(self):
 		'''直接删除session'''
-		web.ctx.session.kill()
+		try:
+			web.ctx.session.kill()
+		except:
+			pass
 		return json.dumps({'res' : 1, 'redirect' : '/'})

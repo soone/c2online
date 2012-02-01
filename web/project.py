@@ -28,11 +28,9 @@ urls = (
 		'/actioning/(\d+)/(.+)', 'Actioning',
         )
 
-logUserInfo = {}
 def onload(handler):
 	try:
-		global logUserInfo
-		logUserInfo = {'uName' : web.ctx.session.uName, 'uAuth' : web.ctx.session.uAuth, 'uId' : web.ctx.session.uId}
+		web.ctx.session.uName is None
 	except:
 		if 'HTTP_X_REQUESTED_WITH' in web.ctx:
 			return json.dumps({'res' : 0, 'msg' : '各项不能为空'})
@@ -57,9 +55,9 @@ class Project:
 			plist = db.select('c2_project', order='p_status asc, p_cdateline desc')
 			if len(plist) == 0:
 				plist = ''
-			return render.project(plist = plist, ac = 2, logUserInfo = logUserInfo)
+			return render.project(plist = plist, ac = 2, logUserInfo = web.ctx.session)
 		except:
-			return render.project(ac = 2, logUserInfo = logUserInfo)
+			return render.project(ac = 2, logUserInfo = web.ctx.session)
 
 
 class Create:
@@ -224,7 +222,7 @@ class Package:
 
 			#真正实际打包到相应位置
 			r = res[0]
-			vcsPack = vcspack.VcsPack(**{'vpath' : r.p_vcspath, 'vuser' : r.p_user, 'vpass' : r.p_pass, 'vid' : pro})
+			vcsPack = vcspack.VcsPack({'vpath' : r.p_vcspath, 'vuser' : r.p_user, 'vpass' : r.p_pass, 'vid' : pro})
 			vcsPack.goPack(insVal, verno)
 			return json.dumps({'res' : 1})
 		except:
@@ -363,7 +361,7 @@ class Actioning:
 			yield '<div>检测发布包状态...</div>'
 			rePack = []
 			packInfo = [dict(p) for p in pInfo]
-			vPack = vcspack.VcsPack(**{'vpath' : projectInfo['p_vcspath'], 'vuser' : projectInfo['p_user'], 'vpass' : projectInfo['p_pass'], 'vid' : proId})
+			vPack = vcspack.VcsPack({'vpath' : projectInfo['p_vcspath'], 'vuser' : projectInfo['p_user'], 'vpass' : projectInfo['p_pass'], 'vid' : proId})
 			for p in packInfo:
 				if os.path.isfile(packDir + '%s.tar.gz' % p['r_no']) is False:
 					rePack.append([p['r_id'], p['r_no']])
@@ -387,7 +385,7 @@ class Actioning:
 				isVpn = (v.isEmpty(serInfo['s_vpn']) == False) and (v.isEmpty(serInfo['s_vpnuser']) == False) and (v.isEmpty(serInfo['s_vpnpass']) == False)
 				if isVpn:
 					yield '<div>开始拨号连接...</div>'
-					vpnRs = sl.vpnConnect(**{'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro'], 'route' : serInfo['s_host']})
+					vpnRs = sl.vpnConnect({'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro'], 'route' : serInfo['s_host']})
 					yield '<div>%s</div>' % str(vpnRs)
 					if vpnRs.find('succeeded') == -1:
 						yield '<div style="color:#f30">vpn拨号失败，请重试</div>'

@@ -144,7 +144,6 @@ define(function(require, exports, module){
 				{
 					if($('#main > table').length == 0) $('#main').append(listTable);
 					$('#main > table > tbody').html('');
-					var tbodys = [];
 					for(var i = 0, j = data['logs'].length; i < j; i++)
 					{
 						var files = [];

@@ -33,9 +33,9 @@ class Servers:
 			slist = db.select('c2_server', order='s_status, s_cdateline desc')
 			if len(slist) == 0:
 				slist = ''
-			return render.servers(slist = slist, ac = 3)
+			return render.servers(slist = slist, ac = 3, logUserInfo = web.ctx.session)
 		except:
-			return render.servers(ac = 3)
+			return render.servers(ac = 3, logUserInfo = web.ctx.session)
 
 class Create:
 	def POST(self):

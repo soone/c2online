@@ -102,7 +102,7 @@ define(function(require, exports, modules){
 	//处理登录表单显示
 	exports.loginDisplay = function(uInfo){
 		var logForms = '<form class="pull-right" id="loginforms"><input class="input-small" type="text" placeholder="Username" name="username" id="loginuserinput"><input class="input-small" type="password" placeholder="Password" name="password"><button class="btn" type="button" id="loginsubmit">登陆</button></form>';
-		var login = '<div class="logined pull-right" id="logininfos">你好！<a href="javascript:;" id="loginname"></a>&nbsp;&nbsp;<a href="javascript:;" id="authset">设置</a>&nbsp;&nbsp;<a href="javascript:;">退出</a></div>';
+		var login = '<div class="logined pull-right" id="logininfos">你好！<a href="javascript:;" id="loginname"></a>&nbsp;&nbsp;<a href="javascript:;" id="logset">设置</a>&nbsp;&nbsp;<a href="javascript:;" id="logout">退出</a></div>';
 		if(!uInfo.length && !$('#loginforms').length)
 			$('#topnav').append(logForms);
 
