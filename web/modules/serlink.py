@@ -6,7 +6,7 @@ from conf import config
 import subprocess
 import hashlib
 
-class SerLink:
+class SerLink(object):
 	'''本地服务器和目标服务器交互的助手类'''
 	def __init__(self, **sInfo):
 		self.host = sInfo['host']

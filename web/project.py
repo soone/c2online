@@ -43,10 +43,10 @@ render = config.render
 appProject = web.application(urls, globals())
 appProject.add_processor(onload)
 
-class ReProject:
+class ReProject(object):
 	def GET(self): raise web.redirect('/')
 
-class Project:
+class Project(object):
     def GET(self):
 		'''取数据库项目信息'''
 		try:
@@ -60,7 +60,7 @@ class Project:
 			return render.project(ac = 2, logUserInfo = web.ctx.session)
 
 
-class Create:
+class Create(object):
 	def POST(self):
 		inputs = web.input()
 		name = inputs['pname'].strip()
@@ -93,7 +93,7 @@ class Create:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Change:
+class Change(object):
 	def POST(self):
 		inputs = web.input()
 		status = 1
@@ -113,7 +113,7 @@ class Change:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Update:
+class Update(object):
 	def POST(self):
 		inputs = web.input()
 		name = inputs['name'].strip()
@@ -146,7 +146,7 @@ class Update:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class VcsList:
+class VcsList(object):
 	def POST(self):
 		inputs = web.input()
 		vids = inputs['vids'].strip()
@@ -176,7 +176,7 @@ class VcsList:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '版本号错误'})
 
-class Package:
+class Package(object):
 	def POST(self):
 		inputs = web.input()
 		pro = inputs['pro'].strip()
@@ -228,7 +228,7 @@ class Package:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统出错'})
 
-class PackList:
+class PackList(object):
 	def GET(self, pro, page = None):
 		v = valids.Valids()
 		if v.isEmpty(pro) or int(pro) == 0:
@@ -269,7 +269,7 @@ class PackList:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
 
-class PackDetail:
+class PackDetail(object):
 	def GET(self, rId):
 		v = valids.Valids();
 		if v.isEmpty(rId) or int(rId) == 0:
@@ -288,7 +288,7 @@ class PackDetail:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '读取失败，请刷新'})
 
-class PackStatus:
+class PackStatus(object):
 	def GET(self, rSt, rId):
 		v = valids.Valids()
 		if v.isEmpty(rId) or int(rId) == 0 or v.isEmpty(rSt) or int(rSt) == 0 or int(rSt) not in [1, 2]:
@@ -303,7 +303,7 @@ class PackStatus:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '删除失败'})
 
-class ShortList:
+class ShortList(object):
 	def GET(self):
 		'''取数据库项目信息'''
 		try:
@@ -317,7 +317,7 @@ class ShortList:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '项目列表读取失败'})
 
-class Actioning:
+class Actioning(object):
 	def GET(self, serId, packageId):
 		web.header('Content-type', 'text/html;charset=UTF-8')
 		web.header("Cache-Control", "no-cache, must-revalidate")

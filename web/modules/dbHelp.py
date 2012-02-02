@@ -1,7 +1,7 @@
 from conf import config
 import web
 
-class DbHelp:
+class DbHelp(object):
 	def __init__(self):
 		self.dbInfo = config.DBINFO
 

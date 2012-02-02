@@ -50,7 +50,7 @@ class Index(object):
 	def GET(self, path):
 		return render.index(ac=1, logUserInfo = web.ctx.session)
 
-class UserList:
+class UserList(object):
 	def GET(self):
 		'''取管理员列表'''
 		try:
@@ -69,7 +69,7 @@ class UserList:
 		except:
 			return json.dumps({'res' : 0, 'msg' : 'Oops...请重新刷新页面'})
 
-class UserSetStatus:
+class UserSetStatus(object):
 	def POST(self):
 		inputs = web.input()
 		uId = inputs['uId'].strip()
@@ -88,7 +88,7 @@ class UserSetStatus:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class UserSetPwd:
+class UserSetPwd(object):
 	def POST(self):
 		inputs = web.input()
 		uId = inputs['uId'].strip()
@@ -120,7 +120,7 @@ class UserSetPwd:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class UserAdd:
+class UserAdd(object):
 	def POST(self):
 		inputs = web.input()
 		uName = inputs['uName'].strip()

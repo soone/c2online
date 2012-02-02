@@ -4,7 +4,7 @@ import re
 import pysvn
 import os
 
-class Vcs:
+class Vcs(object):
 	'''用来从版本控制系统中提取要发布到文件列表'''
 	def __init__(self, vPath, vUser, vPass):
 		self.vPath = vPath

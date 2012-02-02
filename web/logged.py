@@ -17,10 +17,10 @@ urls = (
 render = config.render
 appLogged = web.application(urls, globals())
 
-class ReIndex:
+class ReIndex(object):
 	def GET(self): raise web.redirect('/', True)
 
-class Login:
+class Login(object):
 	def POST(self):
 		inputs = web.input()
 		user = inputs['user'].strip()
@@ -55,7 +55,7 @@ class Login:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Logout:
+class Logout(object):
 	def GET(self):
 		'''直接删除session'''
 		try:

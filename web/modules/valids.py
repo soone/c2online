@@ -3,7 +3,7 @@
 import types
 import re
 
-class Valids:
+class Valids(object):
 	def __init__(self):
 		pass
 

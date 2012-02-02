@@ -4,7 +4,7 @@ from conf import config
 import hashlib
 import os
 
-class VcsPack:
+class VcsPack(object):
 	'''专门打包从版本库抽象出来的文件'''
 	def __init__(self, **v):
 		self.dirs = config.PACKAGEROOT % (hashlib.new('md5', str(v['vid'])).hexdigest()[8:-8])

@@ -33,10 +33,10 @@ render = config.render
 appServers = web.application(urls, globals())
 appServers.add_processor(onload)
 
-class ReServers:
+class ReServers(object):
 	def GET(self): raise web.redirect('/')
 
-class Servers:
+class Servers(object):
 	def GET(self):
 		try:
 			dbase = dbHelp.DbHelp()
@@ -48,7 +48,7 @@ class Servers:
 		except:
 			return render.servers(ac = 3, logUserInfo = web.ctx.session)
 
-class Create:
+class Create(object):
 	def POST(self):
 		inputs = web.input()
 		pId = inputs['pid'].strip()
@@ -109,7 +109,7 @@ class Create:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Change:
+class Change(object):
 	def POST(self):
 		inputs = web.input()
 		status = 1
@@ -129,7 +129,7 @@ class Change:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Update:
+class Update(object):
 	def POST(self):
 		inputs = web.input()
 		name = inputs['name'].strip()
@@ -170,7 +170,7 @@ class Update:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class ShortList:
+class ShortList(object):
 	def GET(self, pId):
 		'''取数据库服务器列表信息'''
 		v = valids.Valids()
