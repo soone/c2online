@@ -86,18 +86,56 @@ define(function(require, exports, module){
 						ts += '';
 						ts += (data['curId'] == users[i].adm_id || data['curAuth'] == 1) ? '&nbsp;<a href="javascript:;" id="setpass_' + users[i].adm_id + '" class="btn">修改密码</a>' : '';
 						if(data['curId'] != users[i].adm_id && data['curAuth'] == 1)
-						{
 							ts += users[i].adm_status == 1 ? '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_0" class="btn">设为关闭</a>' : '&nbsp;<a href="javascript:;" id="admstatus_' + users[i].adm_id + '_1" class="btn">设为正常</a>';
-						}
 
 						ts += '</td></tr>';
 						tbodys.push(ts);
 						ts = '';
 					}
 
+					if(data['curAuth'] == 1)
+						tbodys.push('<tr></tr><tr><td colspan="5"><h3>增加用户</h3><form id="adminform"><fieldset><div class="clearfix"><label for="username">登录名：</label><div class="input"><input type="text" name="username" size="30" id="username"></div></div><div class="clearfix"><label for="userpwd">密码：</label><div class="input"><input type="password" name="userpwd" size="30" id="userpwd"></div></div><div class="clearfix"><label for="repeatpwd">确认密码：</label><div class="input"><input type="password" name="repeatpwd" size="30" id="repeatpwd"></div></div></fieldset><div class="actions"><a class="btn primary" id="addadmin">提交</a></div></form></td></tr>');
+
 					$('#ulist > tbody').html(tbodys.join(''));
 					return false;
 				}
+			});
+
+			$('#addadmin').live('click', function(){
+				std.active('addadmin');
+				var uName = $('#username').val();
+				var uPwd = $('#userpwd').val();
+				var repeatPwd = $('#repeatpwd').val();
+				var uNameLen = uName.length;
+				var uPwdLen = uPwd.length;
+				var msg = '';
+				if(uNameLen < 5 || uNameLen > 12)
+					msg += '登录名必须在5-12个字符之间<br />';
+
+				if(uPwdLen < 6 || uPwdLen > 12 || uPwd != repeatPwd)
+					msg += '密码必须在6-12个字符之间，并且两次密码必须一致<br />';
+
+				if(msg)
+				{
+					std.alertErrorBox('adminform', msg);
+					std.resetActive('addadmin');
+					return false;
+				}
+
+				std.getJson('POST', '/users/add', {uName : uName, pwd : uPwd}, function(data){
+					if(data['res'] == 1)
+					{
+						$('#username').val('');
+						$('#userpwd').val('');
+						$('#repeatpwd').val('');
+						alert(data['msg']);
+					}
+					else
+						std.alertErrorBox('adminform', data['msg']);
+
+					std.resetActive('addadmin');
+					return false;
+				});
 			});
 
 			$('a[id^="setpass_"]').live('click', function(){
@@ -126,17 +164,11 @@ define(function(require, exports, module){
 				}
 
 				std.getJson('POST', '/users/pwd', {pwd : pwd, uId : id}, function(data){
+					std.resetActive(idName);
 					if(data['res'] == 0)
-					{
 						std.alertErrorBox('main', data['msg']);
-						std.resetActive(idName);
-						return false;
-					}
 					else
-					{
-						alert(idName);
 						$('#' + idName).parents('tr').fadeOut('slow');
-					}
 				});
 			});
 

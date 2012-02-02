@@ -32,8 +32,8 @@ def onload(handler):
 	try:
 		web.ctx.session.uName is None
 	except:
-		if 'HTTP_X_REQUESTED_WITH' in web.ctx:
-			return json.dumps({'res' : 0, 'msg' : '各项不能为空'})
+		if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+			return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
 		else:
 			web.seeother('/index?login', True)
 

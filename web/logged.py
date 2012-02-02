@@ -55,67 +55,6 @@ class Login:
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-class Change:
-	def POST(self):
-		inputs = web.input()
-		status = 1
-		if len(inputs['checkboxs']) == 0:
-			return json.dumps({'res' : 0, 'msg' : '请至少选择一项'})
-
-		if len(inputs['status']) > 0:
-			status = inputs['status'].strip()
-
-		#修改数据库
-		try:
-			ids = inputs['checkboxs'].strip().split('|')
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			db.update('c2_server', s_status = status, where = 's_id IN $ids', vars=locals())
-			return json.dumps({'res' : 1})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '系统错误'})
-
-class Update:
-	def POST(self):
-		inputs = web.input()
-		name = inputs['name'].strip()
-		id = inputs['id'].strip()
-		val = inputs['val'].strip()
-		v = valids.Valids()
-
-		if (v.isEmpty(name) or \
-			v.isEmpty(id) or \
-			v.isEmpty(val)) and name.find('vpn') == -1:
-			return json.dumps({'res' : 0, 'msg' : '数据不合法'})
-
-		#修改数据
-		try:
-			if name == 'pdir':
-				dVal = {'s_pdir' : val}
-			elif name == 'bdir':
-				dVal = {'s_bdir' : val}
-			elif name == 'host':
-				dVal = {'s_host': val}
-			elif name == 'user':
-				dVal = {'s_user': val}
-			elif name == 'pass':
-				dVal = {'s_pass': val}
-			elif name == 'vpn':
-				dVal = {'s_vpn': val}
-			elif name == 'vpnuser':
-				dVal = {'s_vpnuser': val}
-			elif name == 'vpnpass':
-				dVal = {'s_vpnpass': val}
-			else:
-				return json.dumps({'res' : 0, 'msg' : '数据不合法'})
-
-			dbase = dbHelp.DbHelp()
-			db = dbase.database()
-			db.update('c2_server', where = 's_id = $id', vars = locals(), **dVal)
-			return json.dumps({'res' : 1})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '系统错误'})
-
 class Logout:
 	def GET(self):
 		'''直接删除session'''

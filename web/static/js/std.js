@@ -53,7 +53,15 @@ define(function(require, exports, modules){
 	};
 
 	exports.getJson = function(type, url, data, callback){
-		$.ajax({type: type, url: url, data:data, dataType: 'json', success:callback});
+		$.ajax({type: type, url: url, data:data, dataType: 'json', success:function(data){
+			if(data['res'] == 'error')
+			{
+				exports.alertErrorBox('main', data['msg']);
+				return;
+			}
+
+			callback(data)
+		}});
 	};
 
 	exports.getLocalTime = function(nS){

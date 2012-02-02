@@ -10,6 +10,7 @@ import json
 from modules import dbHelp
 from modules import valids
 import hashlib
+import time
 
 urls = (
 	'/servers', servers.appServers,
@@ -18,11 +19,21 @@ urls = (
 	'/users', 'UserList',
 	'/users/set', 'UserSetStatus',
 	'/users/pwd', 'UserSetPwd',
+	'/users/add', 'UserAdd',
 	'/(.*)',  'Index',
 )
 
 def onload(handler):
 	web.ctx.session = session
+	try:
+		web.ctx.session.uName is None
+	except:
+		if web.ctx.env['PATH_INFO'] in ['/users', '/users/set', '/users/pwd', '/users/add']:
+			if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+				return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
+			else:
+				web.seeother('/index?login', True)
+
 	return handler()
 
 render = config.render
@@ -106,6 +117,40 @@ class UserSetPwd:
 
 			db.update('c2_admin', adm_pass = md5Pwd, where = 'adm_id = $uId', vars=locals())
 			return json.dumps({'res' : 1})
+		except:
+			return json.dumps({'res' : 0, 'msg' : '系统错误'})
+
+class UserAdd:
+	def POST(self):
+		inputs = web.input()
+		uName = inputs['uName'].strip()
+		pwd = inputs['pwd'].strip()
+		v = valids.Valids()
+		pwdLen = len(pwd)
+		nameLen = len(uName)
+
+		if v.isEmpty(uName) or nameLen < 4 or nameLen > 12:
+			return json.dumps({'res' : 0, 'msg' : '登录名长度必须在6－12个字符之间'})
+
+		if v.isEmpty(pwd) or pwdLen < 6 or pwdLen > 12:
+			return json.dumps({'res' : 0, 'msg' : '密码长度必须在6－12个字符之间'})
+
+		if web.ctx.session.uAuth != 1:
+			return json.dumps({'res' : 0, 'msg' : '对不起，你没有权限添加用户'})
+
+
+		#操作数据库
+		try:
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			#查看用户是否存在
+			existUser = db.select('c2_admin', what = 'adm_id', where = 'adm_user = $uName', limit = 1, vars = locals())
+			if len(existUser) > 0:
+				return json.dumps({'res' : 0, 'msg' : '用户已经存在'})
+
+			md5Pwd = hashlib.new('md5', '%s%s' % (uName, pwd)).hexdigest()
+			db.insert('c2_admin', adm_user = uName, adm_pass = md5Pwd, adm_dateline = time.time())
+			return json.dumps({'res' : 1, 'msg' : '用户添加成功，请点击设置重新读取用户列表'})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 

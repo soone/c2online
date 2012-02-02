@@ -8,7 +8,7 @@ import web
 web.config.session_parameters['cookie_name'] = 'c2onlineSessionId' #保存session id的cookie的名称
 web.config.session_parameters['cookie_domain'] = None #保存session id的Cookie的domain的信息
 web.config.session_parameters['timeout'] = 1800 #session的有效时间，以秒为单位
-web.config.session_parameters['ignore_expiry'] = False #如果为True，session永不过期
+web.config.session_parameters['ignore_expiry'] = True #如果为True，session永不过期
 web.config.session_parameters['ignore_change_ip'] = True #如果为True，则表明只有在访问该session的IP与创建该session的ip完全一致时，才被允许访问
 web.config.session_parameters['secret_key'] = 'fLjUf2*feRiU3#' #密码种子，为session加密提供一个字符串种子
 web.config.session_parameters['expired_message'] = '对不起，会话过期，请重新登录' #session过期时显示的提示信息
