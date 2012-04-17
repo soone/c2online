@@ -64,11 +64,18 @@ class SerLink(object):
 		return ''
 
 	def sshRelese(self, verNos):
+		return self.shellExec(config.RELEASENAME, verNos);
+
+	def sshRollback(self, verNos):
+		return self.shellExec(config.ROLLBACKNAME, verNos)
+
+	def shellExec(self, shellName, verNos):
 		'''登录目标服务器运行发布脚本'''
 		client = pxssh.pxssh()
 		client.login(self.host, self.user, self.pw)
-		client.sendline('python %s%s "%s" %s %s' % (self.bdir, config.RELEASENAME, ' '.join(verNos), self.bdir, self.pdir))
+		client.sendline('python %s%s "%s" %s %s' % (self.bdir, shellName, ' '.join(verNos), self.bdir, self.pdir))
 		client.prompt()
 		rlog = client.before
 		client.logout()
 		return rlog.replace('\n', '<br />')
+

@@ -223,7 +223,7 @@ class Package(object):
 
 			#真正实际打包到相应位置
 			r = res[0]
-			vcsPack = vcspack.VcsPack({'vpath' : r.p_vcspath, 'vuser' : r.p_user, 'vpass' : r.p_pass, 'vid' : pro})
+			vcsPack = vcspack.VcsPack(vpath = r.p_vcspath, vuser = r.p_user, vpass = r.p_pass, vid = pro)
 			vcsPack.goPack(insVal, verno)
 			return json.dumps({'res' : 1})
 		except:
@@ -362,7 +362,7 @@ class Actioning(object):
 			yield '<div>检测发布包状态...</div>'
 			rePack = []
 			packInfo = [dict(p) for p in pInfo]
-			vPack = vcspack.VcsPack({'vpath' : projectInfo['p_vcspath'], 'vuser' : projectInfo['p_user'], 'vpass' : projectInfo['p_pass'], 'vid' : proId})
+			vPack = vcspack.VcsPack(vpath = projectInfo['p_vcspath'], vuser = projectInfo['p_user'], vpass = projectInfo['p_pass'], vid = proId)
 			for p in packInfo:
 				if os.path.isfile(packDir + '%s.tar.gz' % p['r_no']) is False:
 					rePack.append([p['r_id'], p['r_no']])
@@ -419,5 +419,5 @@ class Actioning(object):
 			except Exception, e:
 				yield '<div style="color:#f30">' + str(e) + '</div>'
 				return 
-		except:
+		except Exception, e:
 			yield '服务器故障，请点击右上角的X重新发布'
