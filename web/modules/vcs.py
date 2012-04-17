@@ -11,6 +11,7 @@ class Vcs(object):
 		self.vPass = vPass
 		self.client = pysvn.Client()
 		self.client.callback_get_login = self.getLogin
+		self.client.exception_style = 0
 		self.preLen = len(self.vPath[len(self.client.root_url_from_path(self.vPath)):])
 
 	def getLogin(self, relam, username, may_save):
@@ -21,14 +22,10 @@ class Vcs(object):
 		logs = []
 		for v in vers:
 			ls = self.client.log(self.vPath, 
-			discover_changed_paths = True, 
-			revision_start = pysvn.Revision(pysvn.opt_revision_kind.number, v), 
-			revision_end = pysvn.Revision(pysvn.opt_revision_kind.number, v))
-			if len(ls) > 0:
-                #logs.append([v, [[l.action, l.path[self.preLen:]] for l in ls[0].changed_paths]])
-				print([v, [[l.action, l.path[self.preLen:]] for l in ls[0].changed_paths]])
-                print(ls[0].change_paths)
-
+                discover_changed_paths = True, 
+                revision_start = pysvn.Revision(pysvn.opt_revision_kind.number, v), 
+                revision_end = pysvn.Revision(pysvn.opt_revision_kind.number, v))
+			if len(ls) > 0: logs.append([v, [[l.action, l.path[self.preLen:]] for l in ls[0].changed_paths]])
 		return logs
 
 	def export(self, sourceUrl, destPath, ver):

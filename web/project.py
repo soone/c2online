@@ -173,8 +173,9 @@ class VcsList(object):
 			rs = res[0]
 			pv = vcs.Vcs(vPath = rs.p_vcspath, vUser = rs.p_user, vPass = rs.p_pass)
 			return json.dumps({'res' : 1, 'logs' : pv.getLog(vidsArr)})
-		except:
-			return json.dumps({'res' : 0, 'msg' : '版本号错误'})
+		except Exception, e:
+#return json.dumps({'res' : 0, 'msg' : '版本号错误'})
+			return json.dumps({'res' : 0, 'msg' : e.args})
 
 class Package(object):
 	def POST(self):
