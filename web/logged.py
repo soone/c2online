@@ -37,7 +37,7 @@ class Login(object):
 			#查看用户是否真实存在
 			res = db.select('c2_admin', what = '*', where = 'adm_user = $user', limit = 1, vars = locals())
 			if len(res) < 1:
-				return json.dumps({'res' : 0, 'msg' : 'Oops...用户名或密码错误'})
+				return json.dumps({'res' : 0, 'msg' : 'Oops...用户不存在'})
 
 			uInfo = res[0]
 
