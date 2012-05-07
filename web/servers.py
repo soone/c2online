@@ -18,20 +18,20 @@ urls = (
 		'/history/(\d*)/(\d*)', 'History',
 )
 
-def onload(handler):
-	try:
-		web.ctx.session.uName is None
-	except:
-		if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
-			return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
-		else:
-			web.seeother('/index?login', True)
-
-	return handler()
+#def onload(handler):
+#	try:
+#		web.ctx.session.uName is None
+#	except:
+#		if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+#			return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
+#		else:
+#			web.seeother('/index?login', True)
+#
+#	return handler()
 
 render = config.render
 appServers = web.application(urls, globals())
-appServers.add_processor(onload)
+#appServers.add_processor(onload)
 
 class ReServers(object):
 	def GET(self): raise web.redirect('/')
@@ -44,9 +44,11 @@ class Servers(object):
 			slist = db.select('c2_server', order='s_status, s_cdateline desc')
 			if len(slist) == 0:
 				slist = ''
-			return render.servers(slist = slist, ac = 3, logUserInfo = web.ctx.session)
+			#return render.servers(slist = slist, ac = 3, logUserInfo = web.ctx.session)
+			return render.servers(slist = slist, ac = 3)
 		except:
-			return render.servers(ac = 3, logUserInfo = web.ctx.session)
+			#return render.servers(ac = 3, logUserInfo = web.ctx.session)
+			return render.servers(ac = 3)
 
 class Create(object):
 	def POST(self):

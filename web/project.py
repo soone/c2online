@@ -28,20 +28,20 @@ urls = (
 		'/actioning/(\d+)/(.+)', 'Actioning',
         )
 
-def onload(handler):
-	try:
-		web.ctx.session.uName is None
-	except:
-		if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
-			return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
-		else:
-			web.seeother('/index?login', True)
-
-	return handler()
+#def onload(handler):
+#	try:
+#		web.ctx.session.uName is None
+#	except:
+#		if 'HTTP_X_REQUESTED_WITH' in web.ctx.environ and web.ctx.environ['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest':
+#			return json.dumps({'res' : 'error', 'msg' : '您已经退出登录，请<a href="/index?login">重新登录</a>'})
+#		else:
+#			web.seeother('/index?login', True)
+#
+#	return handler()
 
 render = config.render
 appProject = web.application(urls, globals())
-appProject.add_processor(onload)
+#appProject.add_processor(onload)
 
 class ReProject(object):
 	def GET(self): raise web.redirect('/')
@@ -55,9 +55,11 @@ class Project(object):
 			plist = db.select('c2_project', order='p_status asc, p_cdateline desc')
 			if len(plist) == 0:
 				plist = ''
-			return render.project(plist = plist, ac = 2, logUserInfo = web.ctx.session)
+			#return render.project(plist = plist, ac = 2, logUserInfo = web.ctx.session)
+			return render.project(plist = plist)
 		except:
-			return render.project(ac = 2, logUserInfo = web.ctx.session)
+			#return render.project(ac = 2, logUserInfo = web.ctx.session)
+			return render.project(ac = 2)
 
 
 class Create(object):
