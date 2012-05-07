@@ -10,6 +10,7 @@ class RollBack:
 		self.relDir = sys.argv[2]
 		self.wwwDir = sys.argv[3]
 		#解压压缩包
+		os.system('mkdir -p %s/%s' % (self.relDir, self.verNo))
 		os.system('tar zxvf %s/%s.tar.gz -C %s/%s' % (self.relDir, self.verNo, self.relDir, self.verNo))
 		self.curSource = self.relDir + '/' + self.verNo + '/source'
 		self.curBackup = self.relDir + '/' + self.verNo + '/backup'
