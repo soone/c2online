@@ -17,15 +17,6 @@
 							${navactive(3)}<a href="/servers">服务器管理</a></li>
 					</ul>
                 </nav>
-				%if 'uName' in logUserInfo:
-				<div class="logined pull-right" id="logininfos">你好！<a href="javascript:;">${logUserInfo.uName}</a>&nbsp;&nbsp;<a href="javascript:;" id="logset">设置</a>&nbsp;&nbsp;<a href="javascript:;" id="logout">退出</a></div>
-				%else:
-                <form class="pull-right" id="loginforms">
-                    <input class="input-small" type="text" placeholder="Username" name="username" id="loginuserinput">
-                    <input class="input-small" type="password" placeholder="Password" name="password">
-                    <button class="btn" type="button" id="loginsubmit">登陆</button>
-                </form>
-				%endif
               </div>
             </div>
         </header>
