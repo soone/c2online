@@ -26,6 +26,7 @@ urls = (
 		'/packdetail/(\d+)', 'PackDetail',
 		'/packstatus/(\d+)/(\d+)', 'PackStatus',
 		'/actioning/(\d+)/(.+)', 'Actioning',
+		'/rollbacking/(\d+)/(.+)', 'Rollbacking',
         )
 
 #def onload(handler):
@@ -412,6 +413,86 @@ class Actioning(object):
 				if relRs.find('[ERROR]') == -1:
 					ids = [p['r_id'] for p in packInfo]
 					db.update('c2_revision', r_dateline = time.time(), r_status = 3, s_id = serInfo['s_id'], s_name = serInfo['s_name'], where = 'r_id IN $ids AND r_status <> 2', vars=locals())
+					db.multiple_insert('c2_log', [{'s_id' : serInfo['s_id'], 's_name' : serInfo['s_name'], 'r_id' : p['r_id'], 'r_no' : p['r_no'], 'r_dateline' : time.time()} for p in packInfo])
+				
+				if isVpn:
+					#关闭vpn链接
+					sl.vpnClose()
+					yield 'vpn关闭'
+			except Exception, e:
+				yield '<div style="color:#f30">' + str(e) + '</div>'
+				return 
+		except Exception, e:
+			yield '服务器故障，请点击右上角的X重新发布'
+
+class Rollbacking(object):
+	def GET(self, serId, packageId):
+		web.header('Content-type', 'text/html;charset=UTF-8')
+		web.header("Cache-Control", "no-cache, must-revalidate")
+		web.header("Expires", "Mon, 26 Jul 1997 05:00:00 GMT")
+		yield '<style>body{font-size:14px}</style>'
+		v = valids.Valids()
+		pkId = packageId.strip()
+		sId = serId.strip()
+		if v.isEmpty(pkId) or v.isEmpty(sId):
+			yield '<div>请选择要发布或回滚的版本包和对应的目标服务器，并点击右上角的X重新发布</div>'
+			return
+
+		try:
+			#取的目标服务器信息和对应的项目id
+			dbase = dbHelp.DbHelp()
+			db = dbase.database()
+			sInfo = db.select('c2_server', what = '*', where = 's_id = $sId AND s_status = 1', limit = 1, vars = locals())
+			if len(sInfo) == 0:
+				yield '<div>选择的服务器被关闭或者不存在</div>'
+				return
+
+			#查看项目信息看项目是否可用
+			serInfo = dict(sInfo[0])
+			proId = serInfo['p_id']
+			proInfo = db.select('c2_project', what = '*', where = 'p_id = $proId AND p_status = 1', limit = 1, vars = locals())
+			if len(proInfo) == 0:
+				yield '<div>对应的项目不可用，请检查项目状态</div>'
+
+			projectInfo = dict(proInfo[0])
+
+			packDir = config.PACKAGEROOT % (hashlib.new('md5', str(serInfo['p_id'])).hexdigest()[8 : -8])
+			ids = pkId.split('|')
+			##查看包id对应的项目id是否正确
+			pInfo = db.select('c2_revision', what = 'r_id, r_no', where = 'r_status <> 2 AND r_id IN $ids', order = 'r_id DESC', vars = locals())
+			if len(pInfo) != len(ids):
+				yield '<div>回滚包数量不正确，请点击右上角的X重新选择发布</div>'
+				return
+
+			#回滚开始
+			packInfo = [dict(p) for p in pInfo]
+			try:
+				sl = serlink.SerLink(host = serInfo['s_host'], user = serInfo['s_user'], pw = serInfo['s_pass'], bdir = serInfo['s_bdir'], pdir = serInfo['s_pdir'])
+				isVpn = (v.isEmpty(serInfo['s_vpn']) == False) and (v.isEmpty(serInfo['s_vpnuser']) == False) and (v.isEmpty(serInfo['s_vpnpass']) == False)
+				if isVpn:
+					yield '<div>开始拨号连接...</div>'
+					vpnRs = sl.vpnConnect({'vpn' : serInfo['s_vpn'], 'user' : serInfo['s_vpnuser'], 'pw' : serInfo['s_vpnpass'], 'type' : serInfo['s_vpnpro'], 'route' : serInfo['s_host']})
+					yield '<div>%s</div>' % str(vpnRs)
+					if vpnRs.find('succeeded') == -1:
+						yield '<div style="color:#f30">vpn拨号失败，请重试</div>'
+						return
+
+				pNos = [p['r_no'] for p in packInfo]
+
+				yield '<div>检测回滚包是否存在</div>'
+				checkTar = sl.checkTar(pNos)
+				yield '<div style="color:f30">%s</div>' % str(checkTar)
+				if checkTar.find('[ERROR]') > 0:
+					yield '<div style="color:#f30">回滚失败，服务器上的备份包缺失，请检查</div>'
+					return
+
+				yield '<div>开始在目标服务器进行回滚操作...</div>'
+				relRs = sl.sshRollback(pNos)
+				yield '<div style="color:f30">%s</div>' % str(relRs)
+				#没有错误和失败则更新版本包状态为已发布
+				if relRs.find('[ERROR]') == -1:
+					ids = [p['r_id'] for p in packInfo]
+					db.update('c2_revision', r_dateline = time.time(), r_status = 4, s_id = serInfo['s_id'], s_name = serInfo['s_name'], where = 'r_id IN $ids AND r_status <> 2', vars=locals())
 					db.multiple_insert('c2_log', [{'s_id' : serInfo['s_id'], 's_name' : serInfo['s_name'], 'r_id' : p['r_id'], 'r_no' : p['r_no'], 'r_dateline' : time.time()} for p in packInfo])
 				
 				if isVpn:

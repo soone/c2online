@@ -79,3 +79,6 @@ class SerLink(object):
 		client.logout()
 		return rlog.replace('\n', '<br />')
 
+	def checkTar(self, verNos):
+		return self.shellExec(config.CHECKTARNAME, verNos)
+

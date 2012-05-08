@@ -326,12 +326,14 @@ define(function(require, exports, module){
 								listTr += '<span class="label warning">已删除</span>';
 							else if(ls[i].r_status == 3)
 								listTr += '<span class="label notice">已发布</span>';
+							else if(ls[i].r_status == 4)
+								listTr += '<span class="label warning">已回滚</span>';
 							
 							listTr += '</td><td>' + ls[i].s_name + '</td>';
 							listTr += '<td>' + std.getLocalTime(ls[i].r_dateline) + '</td><td>';
 							if(ls[i].r_status == 1) 
 								listTr += '<a href="javascript:;" class="btn" id="p_chastatus_2_' + ls[i].r_id + '">删除</a>';
-							else if(ls[i].r_status == 2)
+							else if(ls[i].r_status == 2 || ls[i].r_status == 4)
 								listTr += '<a href="javascript:;" id="p_chastatus_1_' + ls[i].r_id + '" class="btn">设置为待发布</a>';
 							listTr += '</td></tr>';
 						}
@@ -408,9 +410,14 @@ define(function(require, exports, module){
 
 			//开始发布
 			var sValues = new Array();
+
+			var iframeUrl = '/project/';
+			iframeUrl += id == releId ? 'actioning' : 'rollbacking';
+			iframeUrl += '/' + tSer + '/';
+
 			checkboxs.each(function(){sValues.push($(this).val());});
 			$('#listtable').before('<div class="alert-message block-message info" id="proccess_info"><a href="javascript:;" id="goingclose" class="close">X</a><h4>操作正在进行中...</h4></div>');
-			$('#proccess_info > h4').append('<iframe width="900" height="200" frameborder="no" allowTransparency="true" scrolling="no" id="going" src="/project/actioning/' + tSer + '/' + sValues.join('|') + '"></iframe>');
+			$('#proccess_info > h4').append('<iframe width="900" height="200" frameborder="no" allowTransparency="true" scrolling="no" id="going" src="' + iframeUrl + sValues.join('|') + '"></iframe>');
 			$('#going').ready(function(){setInterval(function(){var ih = $('#going').contents().find('body').height();if(ih >= 200) $('#going').attr('height', ih+50);}, 1000);});
 		});
 
