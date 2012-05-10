@@ -9,7 +9,14 @@ import hashlib
 class SerLink(object):
 	'''本地服务器和目标服务器交互的助手类'''
 	def __init__(self, **sInfo):
-		self.host = sInfo['host']
+		self.hostPort = None
+		if sInfo['host'].find(':') != -1:
+			hosts = sInfo['host'].split(':')
+			self.host = hosts[0]
+			self.hostPort = hosts[1]
+		else:
+			self.host = sInfo['host']
+
 		self.user = sInfo['user']
 		self.pw = sInfo['pw']
 		self.bdir =  sInfo['bdir']
@@ -51,7 +58,10 @@ class SerLink(object):
 	def scpSend(self, files):
 		'''scp发送文件'''
 		fs = ' '.join(files)
-		scpCmd = 'scp -r %s %s@%s:%s' % (fs, self.user, self.host, self.bdir)
+		if self.hostPort != None:
+			scpCmd = 'scp -P %s -r %s %s@%s:%s' % (self.hostPort, fs, self.user, self.host, self.bdir)
+		else:
+			scpCmd = 'scp -r %s %s@%s:%s' % (fs, self.user, self.host, self.bdir)
 		child = pexpect.spawn(scpCmd)
 		i = child.expect([pexpect.TIMEOUT, 'Are you sure you want to continue connecting', 'password: '])
 		if i == 0:
@@ -72,7 +82,7 @@ class SerLink(object):
 	def shellExec(self, shellName, verNos):
 		'''登录目标服务器运行发布脚本'''
 		client = pxssh.pxssh()
-		client.login(self.host, self.user, self.pw)
+		client.login(self.host, self.user, self.pw, port = self.hostPort)
 		client.sendline('python %s%s "%s" %s %s' % (self.bdir, shellName, ' '.join(verNos), self.bdir, self.pdir))
 		client.prompt()
 		rlog = client.before
