@@ -54,9 +54,6 @@ class Server:
 		if len(self.lines) > 0:
 			for line in self.lines:
 				if line[0] != 'D':
-					if line[0] == 'A' and os.path.isdir('%s/%s' % (self.wwwDir, line[1])) is False:
-						os.system('mkdir -p %s/%s' % (self.wwwDir, line[1]))
-
 					lineDir = line[1][0:line[1].rindex('/')]
 					if os.path.isdir('%s/%s' % (self.wwwDir, lineDir)) is False:
 						os.system('mkdir -p %s/%s' % (self.wwwDir, lineDir))
