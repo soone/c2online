@@ -155,6 +155,6 @@ class UserAdd(object):
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统错误'})
 
-#if __name__ == "__main__":
-#	c2online.run()
-application = c2online.wsgifunc()
+if __name__ == "__main__":
+	c2online.run()
+#application = c2online.wsgifunc()

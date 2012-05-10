@@ -67,6 +67,7 @@ define(function(require, exports, module){
 		$('span[id^="ser"]').live('dblclick', function(){
 			var val = $(this).text();
 			var id = $(this).attr('id');
+			id.indexOf('pass') != -1 ? val = '' : '';
 			$(this).html('<input type="text" value="' + val + '" id="edit_' + id + '" />');
 			$('#edit_' + id).focus();
 		});
@@ -85,7 +86,7 @@ define(function(require, exports, module){
 				if(!data['res'])
 					std.alertErrorBox('slist', data['msg']);
 				else
-					$('#'+id).parent().html(val);
+					id.indexOf("pass") != -1 ? $('#'+id).parent().html('双击修改密码') : $('#'+id).parent().html(val);
 			});
 		});
 
