@@ -214,6 +214,7 @@ class Package(object):
 			valsArr = vals.split('|')
 			valsNum = len(valsArr)
 			insValTmp = [dict(zip(['f_ver', 'f_action', 'f_path'], x.split('::'))) for x in valsArr]
+			insValTmp.sort()
 			insVal = []
 			for x in insValTmp:
 				x.update({'r_id' : rId})
@@ -374,7 +375,7 @@ class Actioning(object):
 					yield ('<div>正在重新打包...</div>')
 					#重新从数据库读取打包列表
 					rId = p['r_id']
-					pkList = db.select('c2_files', what = 'f_action, f_path, f_ver', where = 'r_id = $rId', vars = locals())
+					pkList = db.select('c2_files', what = 'f_action, f_path, f_ver', where = 'r_id = $rId', order = 'f_ver ASC', vars = locals())
 					if len(pkList) == 0:
 						yield ('<div style="color:#f30">该版本不存在打包文件，将放弃重新打包</div>')
 						continue
