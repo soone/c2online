@@ -26,8 +26,8 @@ render = render_mako(
 DBINFO = {
 	'host' : '127.0.0.1',
 	'db' : 'c2online',
-	'user' : 'root',
-	'pw' : '123456',
+	'user' : 'c2online',
+	'pw' : 'J9GDY6K9',
 	'dbn' : 'mysql'
 	}
 
