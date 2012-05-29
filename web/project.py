@@ -216,9 +216,12 @@ class Package(object):
 			insValTmp = [dict(zip(['f_ver', 'f_action', 'f_path'], x.split('::'))) for x in valsArr]
 			insValTmp.sort()
 			insVal = []
+			packVal = []
 			for x in insValTmp:
 				x.update({'r_id' : rId})
 				insVal.append(x)
+				if x['f_action'] != 'D':
+					packVal.append(x)
 
 			#插入数据库
 			rs = db.multiple_insert('c2_files', insVal)
@@ -228,7 +231,7 @@ class Package(object):
 			#真正实际打包到相应位置
 			r = res[0]
 			vcsPack = vcspack.VcsPack(vpath = r.p_vcspath, vuser = r.p_user, vpass = r.p_pass, vid = pro)
-			vcsPack.goPack(insVal, verno)
+			vcsPack.goPack(packVal, verno)
 			return json.dumps({'res' : 1})
 		except:
 			return json.dumps({'res' : 0, 'msg' : '系统出错'})
@@ -375,7 +378,7 @@ class Actioning(object):
 					yield ('<div>正在重新打包...</div>')
 					#重新从数据库读取打包列表
 					rId = p['r_id']
-					pkList = db.select('c2_files', what = 'f_action, f_path, f_ver', where = 'r_id = $rId', order = 'f_ver ASC', vars = locals())
+					pkList = db.select('c2_files', what = 'f_action, f_path, f_ver', where = 'r_id = $rId AND f_action != "D"', order = 'f_ver ASC', vars = locals())
 					if len(pkList) == 0:
 						yield ('<div style="color:#f30">该版本不存在打包文件，将放弃重新打包</div>')
 						continue
