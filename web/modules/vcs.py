@@ -34,4 +34,4 @@ class Vcs(object):
 		if os.path.isdir(destDir) is False:
 			os.system('mkdir -p %s' % destDir)
 
-		self.client.export(sourceUrl, destPath, revision = pysvn.Revision(pysvn.opt_revision_kind.number, ver))
+		self.client.export(sourceUrl, destPath, revision = pysvn.Revision(pysvn.opt_revision_kind.number, ver), force = True)
