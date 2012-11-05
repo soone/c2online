@@ -175,7 +175,12 @@ class VcsList(object):
 
 			rs = res[0]
 			pv = vcs.Vcs(vPath = rs.p_vcspath, vUser = rs.p_user, vPass = rs.p_pass)
-			return json.dumps({'res' : 1, 'logs' : pv.getLog(vidsArr)})
+
+			data={'res' : 1, 'logs' : pv.getLog(vidsArr),'lastVersion':''}
+			vrs = db.select('c2_revision', what = 'r_id, r_no', where = 'p_id = $pro', limit = '1', order = 'r_id DESC', vars = locals())
+			if len(vrs) != 0:
+				data['lastVersion']=vrs[0].r_no
+			return json.dumps(data)
 		except Exception, e:
 #return json.dumps({'res' : 0, 'msg' : '版本号错误'})
 			return json.dumps({'res' : 0, 'msg' : e.args})

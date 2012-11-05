@@ -155,7 +155,10 @@ define(function(require, exports, module){
 
 						$('#main > table > tbody').append('<tr><td><input type="checkbox" id="total_' + data['logs'][i][0] + '" name="all" /></td><td><p>r' + data['logs'][i][0] + '</p></td><td><ul class="unstyled packhide">' + files.join('') + '</ul></td></tr>');
 					}
-
+					if( data['lastVersion']!='')
+					{
+						$("#version").val(data['lastVersion']);
+					}
 					std.resetActive('govcs');
 				}
 			});
