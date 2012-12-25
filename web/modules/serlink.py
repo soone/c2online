@@ -63,7 +63,7 @@ class SerLink(object):
 		else:
 			scpCmd = 'scp -r %s %s@%s:%s' % (fs, self.user, self.host, self.bdir)
 		child = pexpect.spawn(scpCmd)
-		i = child.expect([pexpect.TIMEOUT, 'Are you sure you want to continue connecting', 'password: '])
+		i = child.expect([pexpect.TIMEOUT, 'Are you sure you want to continue connecting', 'password: ', 'Enter passphrase for key'])
 		if i == 0:
 			return 'ERROR!'
 		elif i == 1:
